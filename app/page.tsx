@@ -27,7 +27,7 @@ export default function Home() {
                 </Button>
               </Link>
               <Link href="/register">
-                <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-4 text-lg font-semibold">
+                <Button size="lg" className="bg-purple-600 text-white hover:bg-purple-700 btn-glow px-8 py-4 text-lg font-semibold border-2 border-purple-400">
                   Get Started Free
                 </Button>
               </Link>

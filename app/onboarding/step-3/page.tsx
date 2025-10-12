@@ -8,12 +8,26 @@ export default function OnboardingStep3() {
   const router = useRouter()
   const { data: session, status } = useSession()
   const [loading, setLoading] = useState(false)
+  const [serviceType, setServiceType] = useState<'formation' | 'funding' | ''>('')
   const [formData, setFormData] = useState({
+    // Funding fields
     creditGoal: '',
     painPoints: [] as string[],
+    // Formation fields
+    additionalServices: [] as string[],
+    launchTimeline: '',
+    // Common fields
     preferredCommunication: 'email',
     referralSource: '',
   })
+
+  useEffect(() => {
+    // Get service type from session storage
+    const savedServiceType = sessionStorage.getItem('serviceType') as 'formation' | 'funding' | ''
+    if (savedServiceType) {
+      setServiceType(savedServiceType)
+    }
+  }, [])
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -30,16 +44,29 @@ export default function OnboardingStep3() {
     }))
   }
 
+  const toggleAdditionalService = (service: string) => {
+    setFormData(prev => ({
+      ...prev,
+      additionalServices: prev.additionalServices.includes(service)
+        ? prev.additionalServices.filter(s => s !== service)
+        : [...prev.additionalServices, service]
+    }))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
+      // Clear service type from session storage after completion
+      sessionStorage.removeItem('serviceType')
+
       const response = await fetch('/api/onboarding/progress', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          serviceType,
           currentStep: 'completed',
         }),
       })
@@ -65,6 +92,15 @@ export default function OnboardingStep3() {
     { id: 'low-limits', label: 'Low Credit Limits', icon: '🔒' },
     { id: 'personal-guarantee', label: 'Personal Guarantee Required', icon: '✍️' },
     { id: 'no-tradelines', label: 'No Vendor Trade Lines', icon: '🔗' },
+  ]
+
+  const additionalServicesOptions = [
+    { id: 'registered-agent', label: 'Registered Agent Service', icon: '📬' },
+    { id: 'business-licenses', label: 'Business Licenses & Permits', icon: '📄' },
+    { id: 'business-bank', label: 'Business Bank Account Setup', icon: '🏦' },
+    { id: 'accounting', label: 'Accounting & Bookkeeping', icon: '📊' },
+    { id: 'website', label: 'Website & Domain Setup', icon: '🌐' },
+    { id: 'trademark', label: 'Trademark Registration', icon: '™️' },
   ]
 
   if (status === 'loading') {
@@ -110,68 +146,133 @@ export default function OnboardingStep3() {
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-white">
-                  Your Credit Goals 🎯
+                  {serviceType === 'formation' ? 'Final Details ✨' : 'Your Credit Goals 🎯'}
                 </h1>
               </div>
             </div>
             <p className="text-gray-400">
-              Help us personalize your roadmap by sharing your credit building goals and challenges.
+              {serviceType === 'formation'
+                ? 'Let us know what additional services you need and your timeline for launch.'
+                : 'Help us personalize your roadmap by sharing your credit building goals and challenges.'}
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Credit Goal */}
-            <div>
-              <label htmlFor="creditGoal" className="block text-sm font-medium text-gray-300 mb-3">
-                What's your primary credit goal? *
-              </label>
-              <select
-                id="creditGoal"
-                required
-                value={formData.creditGoal}
-                onChange={(e) => setFormData({ ...formData, creditGoal: e.target.value })}
-                className="w-full px-4 py-3 bg-slate-900/50 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
-              >
-                <option value="">Select your goal</option>
-                <option value="Seeking $25K-$50K loan">Seeking $25K-$50K loan</option>
-                <option value="Seeking $50K-$100K loan">Seeking $50K-$100K loan</option>
-                <option value="Seeking $100K+ loan">Seeking $100K+ loan</option>
-                <option value="Build credit score to 680+">Build credit score to 680+</option>
-                <option value="Get better interest rates">Get better interest rates</option>
-                <option value="Establish business credit">Establish business credit from scratch</option>
-                <option value="Separate personal from business">Separate personal from business credit</option>
-              </select>
-            </div>
-
-            {/* Pain Points */}
-            <div>
-              <label className="block text-sm font-medium text-gray-300 mb-3">
-                What challenges are you facing? (Select all that apply) *
-              </label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {painPointOptions.map(option => (
-                  <button
-                    key={option.id}
-                    type="button"
-                    onClick={() => togglePainPoint(option.id)}
-                    className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
-                      formData.painPoints.includes(option.id)
-                        ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
-                        : 'border-gray-700 bg-slate-900/50 hover:border-gray-600'
-                    }`}
+            {/* Funding Path Fields */}
+            {serviceType === 'funding' && (
+              <>
+                {/* Credit Goal */}
+                <div>
+                  <label htmlFor="creditGoal" className="block text-sm font-medium text-gray-300 mb-3">
+                    What's your primary credit goal? *
+                  </label>
+                  <select
+                    id="creditGoal"
+                    required
+                    value={formData.creditGoal}
+                    onChange={(e) => setFormData({ ...formData, creditGoal: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-900/50 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{option.icon}</span>
-                      <span className={`text-sm font-medium ${
-                        formData.painPoints.includes(option.id) ? 'text-purple-300' : 'text-gray-300'
-                      }`}>
-                        {option.label}
-                      </span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
+                    <option value="">Select your goal</option>
+                    <option value="Seeking $25K-$50K loan">Seeking $25K-$50K loan</option>
+                    <option value="Seeking $50K-$100K loan">Seeking $50K-$100K loan</option>
+                    <option value="Seeking $100K+ loan">Seeking $100K+ loan</option>
+                    <option value="Build credit score to 680+">Build credit score to 680+</option>
+                    <option value="Get better interest rates">Get better interest rates</option>
+                    <option value="Establish business credit">Establish business credit from scratch</option>
+                    <option value="Separate personal from business">Separate personal from business credit</option>
+                  </select>
+                </div>
+
+                {/* Pain Points */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    What challenges are you facing? (Select all that apply) *
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {painPointOptions.map(option => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => togglePainPoint(option.id)}
+                        className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
+                          formData.painPoints.includes(option.id)
+                            ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                            : 'border-gray-700 bg-slate-900/50 hover:border-gray-600'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{option.icon}</span>
+                          <span className={`text-sm font-medium ${
+                            formData.painPoints.includes(option.id) ? 'text-purple-300' : 'text-gray-300'
+                          }`}>
+                            {option.label}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* Formation Path Fields */}
+            {serviceType === 'formation' && (
+              <>
+                {/* Additional Services */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-3">
+                    What additional services do you need? (Select all that apply)
+                  </label>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {additionalServicesOptions.map(option => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        onClick={() => toggleAdditionalService(option.id)}
+                        className={`p-4 rounded-lg border-2 transition-all duration-300 text-left ${
+                          formData.additionalServices.includes(option.id)
+                            ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                            : 'border-gray-700 bg-slate-900/50 hover:border-gray-600'
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{option.icon}</span>
+                          <span className={`text-sm font-medium ${
+                            formData.additionalServices.includes(option.id) ? 'text-purple-300' : 'text-gray-300'
+                          }`}>
+                            {option.label}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">We offer these services for an additional fee</p>
+                </div>
+
+                {/* Launch Timeline */}
+                <div>
+                  <label htmlFor="launchTimeline" className="block text-sm font-medium text-gray-300 mb-3">
+                    When do you plan to launch your business? *
+                  </label>
+                  <select
+                    id="launchTimeline"
+                    required
+                    value={formData.launchTimeline}
+                    onChange={(e) => setFormData({ ...formData, launchTimeline: e.target.value })}
+                    className="w-full px-4 py-3 bg-slate-900/50 border border-gray-700 rounded-lg text-white focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all"
+                  >
+                    <option value="">Select timeline</option>
+                    <option value="ASAP">As soon as possible</option>
+                    <option value="1 month">Within 1 month</option>
+                    <option value="2-3 months">2-3 months</option>
+                    <option value="3-6 months">3-6 months</option>
+                    <option value="6+ months">6+ months</option>
+                    <option value="Just exploring">Just exploring options</option>
+                  </select>
+                </div>
+              </>
+            )}
 
             {/* Preferred Communication */}
             <div>
@@ -266,7 +367,11 @@ export default function OnboardingStep3() {
               </button>
               <button
                 type="submit"
-                disabled={loading || formData.painPoints.length === 0}
+                disabled={
+                  loading ||
+                  (serviceType === 'funding' && formData.painPoints.length === 0) ||
+                  (serviceType === 'formation' && !formData.launchTimeline)
+                }
                 className="bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-500 text-white px-10 py-4 rounded-lg font-semibold hover:shadow-2xl hover:shadow-purple-500/50 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 text-lg"
               >
                 {loading ? 'Saving...' : 'Complete Setup ✨'}
