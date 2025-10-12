@@ -30,6 +30,7 @@ describe('POST /api/auth/register', () => {
       name: 'Test User',
       password: 'hashedPassword123',
       role: 'CLIENT',
+      serviceType: 'formation',
       createdAt: new Date(),
       updatedAt: new Date(),
     }
@@ -71,6 +72,7 @@ describe('POST /api/auth/register', () => {
       name: 'Business Owner',
       password: 'hashedPassword123',
       role: 'CLIENT',
+      serviceType: 'formation',
       createdAt: new Date(),
       updatedAt: new Date(),
     }
@@ -118,6 +120,7 @@ describe('POST /api/auth/register', () => {
       name: 'Existing User',
       password: 'hashedPassword',
       role: 'CLIENT',
+      serviceType: 'funding',
       createdAt: new Date(),
       updatedAt: new Date(),
     }
@@ -228,6 +231,7 @@ describe('POST /api/auth/register', () => {
       name: 'Test User',
       password: 'hashedPassword123',
       role: 'CLIENT',
+      serviceType: 'funding',
       createdAt: new Date(),
       updatedAt: new Date(),
     }

@@ -1,7 +1,92 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Navbar } from '@/components/Navbar'
+import NewsletterSignup from '@/components/NewsletterSignup'
+
+interface BlogPost {
+  id: string
+  title: string
+  slug: string
+  excerpt: string
+  content: string
+  featuredImage?: string
+  publishedAt: string
+  readingTime: number
+  viewCount: number
+  author: {
+    name: string
+  }
+  category?: {
+    name: string
+    slug: string
+  }
+  tags: string[]
+}
+
+interface BlogResponse {
+  posts: BlogPost[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    pages: number
+  }
+}
 
 export default function BlogPage() {
+  const [data, setData] = useState<BlogResponse | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      try {
+        const params = new URLSearchParams()
+        if (searchTerm) params.append('search', searchTerm)
+
+        const response = await fetch(`/api/blog?${params}`)
+        if (response.ok) {
+          const blogData = await response.json()
+          setData(blogData)
+        }
+      } catch (error) {
+        console.error('Error fetching blog posts:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchPosts()
+  }, [searchTerm])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen stars-bg">
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="animate-pulse space-y-8">
+            <div className="text-center">
+              <div className="h-12 bg-white/10 rounded w-1/3 mx-auto mb-4"></div>
+              <div className="h-6 bg-white/10 rounded w-1/2 mx-auto"></div>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="card-dark rounded-xl p-6">
+                  <div className="h-48 bg-white/10 rounded mb-4"></div>
+                  <div className="h-6 bg-white/10 rounded mb-2"></div>
+                  <div className="h-4 bg-white/10 rounded mb-4"></div>
+                  <div className="h-4 bg-white/10 rounded w-1/3"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen stars-bg">
       <Navbar />
@@ -14,115 +99,127 @@ export default function BlogPage() {
           <p className="text-xl text-white/70">
             Insights, tips, and guides for business owners and entrepreneurs
           </p>
-        </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {/* Blog Post 1 */}
-          <div className="card-dark rounded-xl p-6 hover:scale-105 transition-all duration-300">
-            <div className="text-purple-400 mb-4">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          {/* Search Bar */}
+          <div className="max-w-md mx-auto mt-8">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Search posts..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-2 pl-10 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <svg className="absolute left-3 top-2.5 h-5 w-5 text-white/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-3">
-              How to Choose the Right Business Structure
-            </h3>
-            <p className="text-white/70 mb-4">
-              LLC, S-Corp, or C-Corp? Learn which business structure is best for your startup and why it matters.
-            </p>
-            <span className="text-purple-300 text-sm">Coming Soon</span>
-          </div>
-
-          {/* Blog Post 2 */}
-          <div className="card-dark rounded-xl p-6 hover:scale-105 transition-all duration-300">
-            <div className="text-purple-400 mb-4">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-3">
-              Building Business Credit from Scratch
-            </h3>
-            <p className="text-white/70 mb-4">
-              Essential steps to establish and build strong business credit for your new company.
-            </p>
-            <span className="text-purple-300 text-sm">Coming Soon</span>
-          </div>
-
-          {/* Blog Post 3 */}
-          <div className="card-dark rounded-xl p-6 hover:scale-105 transition-all duration-300">
-            <div className="text-purple-400 mb-4">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-3">
-              Essential Documents for Your New Business
-            </h3>
-            <p className="text-white/70 mb-4">
-              A complete checklist of documents you need to get your business up and running legally.
-            </p>
-            <span className="text-purple-300 text-sm">Coming Soon</span>
-          </div>
-
-          {/* Blog Post 4 */}
-          <div className="card-dark rounded-xl p-6 hover:scale-105 transition-all duration-300">
-            <div className="text-purple-400 mb-4">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-3">
-              Funding Options for Startups in 2024
-            </h3>
-            <p className="text-white/70 mb-4">
-              Explore different funding sources available for new businesses, from bootstrapping to venture capital.
-            </p>
-            <span className="text-purple-300 text-sm">Coming Soon</span>
-          </div>
-
-          {/* Blog Post 5 */}
-          <div className="card-dark rounded-xl p-6 hover:scale-105 transition-all duration-300">
-            <div className="text-purple-400 mb-4">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-3">
-              Wyoming: The Best State to Start Your Business
-            </h3>
-            <p className="text-white/70 mb-4">
-              Discover why Wyoming offers unique advantages for new business formations and tax benefits.
-            </p>
-            <span className="text-purple-300 text-sm">Coming Soon</span>
-          </div>
-
-          {/* Blog Post 6 */}
-          <div className="card-dark rounded-xl p-6 hover:scale-105 transition-all duration-300">
-            <div className="text-purple-400 mb-4">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-3">
-              Hiring Your First Employee: A Complete Guide
-            </h3>
-            <p className="text-white/70 mb-4">
-              Everything you need to know about payroll, taxes, and compliance when hiring your first team member.
-            </p>
-            <span className="text-purple-300 text-sm">Coming Soon</span>
           </div>
         </div>
 
-        <div className="text-center mt-16">
-          <p className="text-white/70 mb-6">
-            Want to stay updated with our latest content?
-          </p>
-          <Link href="/register">
-            <button className="bg-purple-600 text-white hover:bg-purple-700 btn-glow px-8 py-3 rounded-lg font-semibold">
-              Subscribe to Updates
-            </button>
-          </Link>
+        {data?.posts.length === 0 ? (
+          <div className="text-center py-16">
+            <div className="card-dark rounded-xl p-8 max-w-md mx-auto">
+              <svg className="w-16 h-16 text-white/30 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+              <h3 className="text-xl font-semibold text-white mb-2">No Posts Found</h3>
+              <p className="text-white/70">
+                {searchTerm ? 'Try adjusting your search terms.' : 'Check back soon for new content!'}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {data?.posts.map((post) => (
+              <Link key={post.id} href={`/blog/${post.slug}`}>
+                <div className="card-dark rounded-xl p-6 hover:scale-105 transition-all duration-300 cursor-pointer">
+                  {post.featuredImage && (
+                    <div className="relative h-48 mb-4 rounded-lg overflow-hidden">
+                      <Image
+                        src={post.featuredImage}
+                        alt={post.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between text-sm text-white/60">
+                      <span>{new Date(post.publishedAt).toLocaleDateString()}</span>
+                      <span>{post.readingTime} min read</span>
+                    </div>
+
+                    {post.category && (
+                      <span className="inline-block bg-purple-500/20 text-purple-300 text-xs px-2 py-1 rounded-full">
+                        {post.category.name}
+                      </span>
+                    )}
+
+                    <h3 className="text-xl font-semibold text-white leading-tight">
+                      {post.title}
+                    </h3>
+
+                    <p className="text-white/70 text-sm leading-relaxed">
+                      {post.excerpt}
+                    </p>
+
+                    <div className="flex items-center justify-between pt-2">
+                      <span className="text-sm text-white/50">
+                        By {post.author.name}
+                      </span>
+                      <span className="text-sm text-white/50">
+                        {post.viewCount} views
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Pagination */}
+        {data && data.pagination.pages > 1 && (
+          <div className="flex justify-center mt-16 space-x-2">
+            {Array.from({ length: data.pagination.pages }, (_, i) => i + 1).map((page) => (
+              <button
+                key={page}
+                onClick={() => {
+                  // Handle pagination
+                  window.scrollTo({ top: 0, behavior: 'smooth' })
+                }}
+                className={`px-4 py-2 rounded-lg transition-colors ${
+                  page === data.pagination.page
+                    ? 'bg-purple-600 text-white'
+                    : 'bg-white/10 text-white/70 hover:bg-white/20'
+                }`}
+              >
+                {page}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="mt-16 grid md:grid-cols-2 gap-8 items-center">
+          <div className="text-center md:text-left">
+            <h3 className="text-2xl font-bold text-white mb-4">
+              Want to stay updated?
+            </h3>
+            <p className="text-white/70 mb-6">
+              Get the latest insights on business formation and funding delivered to your inbox.
+            </p>
+            <Link href="/register">
+              <button className="bg-purple-600 text-white hover:bg-purple-700 btn-glow px-8 py-3 rounded-lg font-semibold">
+                Get Started Today
+              </button>
+            </Link>
+          </div>
+
+          <div className="max-w-md mx-auto md:mx-0">
+            <NewsletterSignup variant="card" />
+          </div>
         </div>
       </div>
 

@@ -17,6 +17,7 @@ model User {
   password      String
   name          String?
   role          String    @default("CLIENT")
+  serviceType   String?   // "formation" or "funding"
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -25,6 +26,7 @@ model User {
   assignedLeads Lead[]     @relation("AssignedTo")
   onboarding    OnboardingProfile?
   emailDrips    EmailDrip[]
+  blogPosts     BlogPost[]
 
   @@map("users")
 }
@@ -190,4 +192,82 @@ model EmailDrip {
   @@index([userId])
   @@index([emailType])
   @@index([scheduledFor])
+}
+
+model Category {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  slug            String   @unique
+  description     String?
+
+  // SEO for category pages
+  metaTitle       String?
+  metaDescription String?
+
+  blogPosts       BlogPost[]
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("categories")
+}
+
+model BlogPost {
+  id              String   @id @default(cuid())
+  title           String
+  slug            String   @unique
+  excerpt         String
+  content         String   @db.Text
+  featuredImage   String?
+
+  // SEO Fields
+  metaTitle       String?
+  metaDescription String?
+  jsonLd          Json?    // For structured data
+  canonicalUrl    String?
+
+  // Categories & Tags
+  categoryId      String?
+  tags            String[] // Array of tag strings
+
+  // Status & Publishing
+  status          String   @default("DRAFT") // DRAFT, PUBLISHED, SCHEDULED
+  publishedAt     DateTime?
+  scheduledFor    DateTime?
+
+  // Author & Analytics
+  authorId        String
+  readingTime     Int?     // Calculated field in minutes
+  viewCount       Int      @default(0)
+
+  // Relations
+  author          User     @relation(fields: [authorId], references: [id])
+  category        Category? @relation(fields: [categoryId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("blog_posts")
+  @@index([slug])
+  @@index([status])
+  @@index([publishedAt])
+  @@index([authorId])
+}
+
+model NewsletterSubscriber {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  source        String   @default("website")
+  interests     String[] @default([])
+  isActive      Boolean  @default(true)
+  subscribedAt  DateTime @default(now())
+  unsubscribedAt DateTime?
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("newsletter_subscribers")
+  @@index([email])
+  @@index([isActive])
+  @@index([source])
 }

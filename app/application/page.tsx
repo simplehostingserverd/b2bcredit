@@ -7,6 +7,7 @@ import { Navbar } from '@/components/Navbar'
 import { Card } from '@/components/Card'
 import { Input } from '@/components/Input'
 import { Button } from '@/components/Button'
+import { BusinessFormationForm } from '@/components/BusinessFormationForm'
 
 export default function ApplicationPage() {
   const { data: session, status } = useSession()
@@ -15,6 +16,7 @@ export default function ApplicationPage() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [userServiceType, setUserServiceType] = useState<'formation' | 'funding' | null>(null)
 
   const [formData, setFormData] = useState({
     businessName: '',
@@ -39,6 +41,13 @@ export default function ApplicationPage() {
       router.push('/login')
     }
   }, [status, router])
+
+  useEffect(() => {
+    // Set service type from session data
+    if (status === 'authenticated' && session?.user) {
+      setUserServiceType(session.user.serviceType || null)
+    }
+  }, [status, session])
 
   useEffect(() => {
     const fetchApplication = async () => {
@@ -129,6 +138,23 @@ export default function ApplicationPage() {
             <div className="h-8 bg-gray-200 rounded w-1/4"></div>
             <div className="h-96 bg-gray-200 rounded"></div>
           </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show different forms based on service type
+  if (userServiceType === 'formation') {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <BusinessFormationForm initialData={{
+            businessName: formData.businessName,
+            businessStructure: formData.businessType,
+            stateOfFormation: formData.businessState,
+            businessIndustry: formData.industry,
+          }} />
         </div>
       </div>
     )

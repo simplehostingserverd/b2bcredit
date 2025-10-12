@@ -14,12 +14,19 @@ export default function RegisterPage() {
     email: '',
     password: '',
     businessName: '',
+    serviceType: '', // 'formation' or 'funding'
   })
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!formData.serviceType) {
+      setError('Please select a service type')
+      return
+    }
+
     setError('')
     setIsLoading(true)
 
@@ -105,6 +112,58 @@ export default function RegisterPage() {
                 required
                 className="w-full bg-white/5 border-white/10 text-white placeholder-white/40"
               />
+            </div>
+
+            {/* Service Type Selection */}
+            <div>
+              <label className="block text-sm font-medium text-white mb-3">
+                What service do you need? *
+              </label>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, serviceType: 'formation' })}
+                  className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
+                    formData.serviceType === 'formation'
+                      ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                      : 'border-white/10 bg-white/5 hover:border-white/20'
+                  }`}
+                >
+                  <div className="flex flex-col gap-2">
+                    <div className="text-2xl mb-1">🏢</div>
+                    <h3 className={`text-base font-semibold ${
+                      formData.serviceType === 'formation' ? 'text-purple-300' : 'text-white'
+                    }`}>
+                      Form a New Business
+                    </h3>
+                    <p className="text-xs text-white/70">
+                      Start your business journey with company formation
+                    </p>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, serviceType: 'funding' })}
+                  className={`p-4 rounded-xl border-2 transition-all duration-300 text-left ${
+                    formData.serviceType === 'funding'
+                      ? 'border-purple-500 bg-purple-500/20 shadow-lg shadow-purple-500/20'
+                      : 'border-white/10 bg-white/5 hover:border-white/20'
+                  }`}
+                >
+                  <div className="flex flex-col gap-2">
+                    <div className="text-2xl mb-1">💰</div>
+                    <h3 className={`text-base font-semibold ${
+                      formData.serviceType === 'funding' ? 'text-purple-300' : 'text-white'
+                    }`}>
+                      Get Business Funding
+                    </h3>
+                    <p className="text-xs text-white/70">
+                      Access funding for your existing business
+                    </p>
+                  </div>
+                </button>
+              </div>
             </div>
 
             <div>

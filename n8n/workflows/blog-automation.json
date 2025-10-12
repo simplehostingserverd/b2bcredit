@@ -1,0 +1,343 @@
+{
+  "name": "Blog Content Automation",
+  "nodes": [
+    {
+      "id": "webhook-trigger",
+      "type": "n8n-nodes-base.webhook",
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "blog-automation",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "name": "Webhook Trigger",
+      "position": [240, 300]
+    },
+    {
+      "id": "event-filter",
+      "type": "n8n-nodes-base.filter",
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "001": "={{ $json.event }}"
+            }
+          ]
+        }
+      },
+      "name": "Filter Events",
+      "position": [460, 300]
+    },
+    {
+      "id": "blog-post-published",
+      "type": "n8n-nodes-base.switch",
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.event }}",
+              "value2": "blog_post_published",
+              "operation": "equals"
+            }
+          ]
+        }
+      },
+      "name": "Blog Post Published",
+      "position": [680, 200]
+    },
+    {
+      "id": "social-media-post",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": {
+          "object": {
+            "platform": "linkedin",
+            "message": "={{ 'New blog post: ' + $json.data.title + '\\n\\n' + $json.data.excerpt + '\\n\\nRead more: ' + $json.data.url }}",
+            "url": "={{ $json.data.url }}",
+            "image": "={{ $json.data.featuredImage }}"
+          }
+        }
+      },
+      "name": "Prepare Social Media Post",
+      "position": [900, 200]
+    },
+    {
+      "id": "linkedin-post",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.LINKEDIN_API_URL }}",
+        "headers": {
+          "Authorization": "={{ 'Bearer ' + $env.LINKEDIN_ACCESS_TOKEN }}",
+          "Content-Type": "application/json"
+        },
+        "bodyParameters": {
+          "author": "={{ $env.LINKEDIN_PERSON_URN }}",
+          "commentary": "={{ $node[\"Prepare Social Media Post\"].json.message }}",
+          "contentUrls": [
+            "={{ $json.url }}"
+          ]
+        }
+      },
+      "name": "Post to LinkedIn",
+      "position": [1120, 200]
+    },
+    {
+      "id": "twitter-post",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.TWITTER_API_URL + '/tweets' }}",
+        "headers": {
+          "Authorization": "={{ 'Bearer ' + $env.TWITTER_BEARER_TOKEN }}",
+          "Content-Type": "application/json"
+        },
+        "bodyParameters": {
+          "text": "={{ $node[\"Prepare Social Media Post\"].json.message.substring(0, 280) + '...' }}",
+          "url": "={{ $json.url }}"
+        }
+      },
+      "name": "Post to Twitter",
+      "position": [1120, 400]
+    },
+    {
+      "id": "newsletter-email",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": {
+          "object": {
+            "subject": "={{ 'New Blog Post: ' + $json.data.title }}",
+            "template": "blog-post-notification",
+            "variables": {
+              "title": "={{ $json.data.title }}",
+              "excerpt": "={{ $json.data.excerpt }}",
+              "url": "={{ $json.data.url }}",
+              "author": "={{ $json.data.author }}",
+              "publishDate": "={{ $json.data.publishedAt }}"
+            }
+          }
+        }
+      },
+      "name": "Prepare Newsletter",
+      "position": [900, 600]
+    },
+    {
+      "id": "send-newsletter",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.EMAIL_SERVICE_URL }}",
+        "headers": {
+          "Authorization": "={{ 'Bearer ' + $env.EMAIL_API_KEY }}",
+          "Content-Type": "application/json"
+        },
+        "bodyParameters": {
+          "to": "subscribers",
+          "template": "={{ $node[\"Prepare Newsletter\"].json.template }}",
+          "variables": "={{ $node[\"Prepare Newsletter\"].json.variables }}"
+        }
+      },
+      "name": "Send Newsletter",
+      "position": [1120, 600]
+    },
+    {
+      "id": "seo-analysis",
+      "type": "n8n-nodes-base.set",
+      "parameters": {
+        "values": {
+          "object": {
+            "postUrl": "={{ $json.data.url }}",
+            "keywords": "={{ $json.data.tags }}",
+            "competitorUrls": [
+              "https://competitor1.com",
+              "https://competitor2.com"
+            ]
+          }
+        }
+      },
+      "name": "Prepare SEO Analysis",
+      "position": [900, 800]
+    },
+    {
+      "id": "run-seo-check",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.SEO_TOOL_API }}",
+        "headers": {
+          "Authorization": "={{ 'Bearer ' + $env.SEO_API_KEY }}",
+          "Content-Type": "application/json"
+        },
+        "bodyParameters": {
+          "url": "={{ $node[\"Prepare SEO Analysis\"].json.postUrl }}",
+          "keywords": "={{ $node[\"Prepare SEO Analysis\"].json.keywords }}",
+          "competitors": "={{ $node[\"Prepare SEO Analysis\"].json.competitorUrls }}"
+        }
+      },
+      "name": "Run SEO Analysis",
+      "position": [1120, 800]
+    },
+    {
+      "id": "store-seo-results",
+      "type": "n8n-nodes-base.httpRequest",
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.BLOG_API_URL + '/admin/blog/' + $json.data.postId + '/seo' }}",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "bodyParameters": {
+          "analysisResults": "={{ $node[\"Run SEO Analysis\"].json }}"
+        }
+      },
+      "name": "Store SEO Results",
+      "position": [1340, 800]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Filter Events",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Events": {
+      "main": [
+        [
+          {
+            "node": "Blog Post Published",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Blog Post Published": {
+      "true": [
+        [
+          {
+            "node": "Prepare Social Media Post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Social Media Post": {
+      "main": [
+        [
+          {
+            "node": "linkedin-post",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "twitter-post",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare SEO Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "linkedin-post": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "twitter-post": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Newsletter": {
+      "main": [
+        [
+          {
+            "node": "send-newsletter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "send-newsletter": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare SEO Analysis": {
+      "main": [
+        [
+          {
+            "node": "run-seo-check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "run-seo-check": {
+      "main": [
+        [
+          {
+            "node": "store-seo-results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "store-seo-results": {
+      "main": [
+        [
+          {
+            "node": "Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "saveExecutionProgress": true,
+    "saveManualExecutions": true
+  }
+}

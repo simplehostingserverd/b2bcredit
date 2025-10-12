@@ -46,7 +46,7 @@ export function Navbar() {
                   <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">Log In</Button>
                 </Link>
                 <Link href="/register">
-                  <Button variant="primary" size="sm" className="bg-white text-purple-900 hover:bg-white/90 btn-glow">Sign Up</Button>
+                  <Button variant="primary" size="sm" className="bg-purple-600 text-white hover:bg-purple-700 btn-glow btn-tracer">Sign Up</Button>
                 </Link>
               </>
             )}

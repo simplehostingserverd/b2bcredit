@@ -8,12 +8,15 @@ const registerSchema = z.object({
   password: z.string().min(8, 'Password must be at least 8 characters'),
   name: z.string().min(1, 'Name is required'),
   businessName: z.string().optional(),
+  serviceType: z.enum(['formation', 'funding'], {
+    required_error: 'Please select a service type',
+  }),
 })
 
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { email, password, name, businessName } = registerSchema.parse(body)
+    const { email, password, name, businessName, serviceType } = registerSchema.parse(body)
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -36,11 +39,12 @@ export async function POST(req: Request) {
         email,
         password: hashedPassword,
         name,
+        serviceType,
         role: 'CLIENT',
         applications: businessName ? {
           create: {
             businessName,
-            businessType: 'LLC',
+            businessType: serviceType === 'formation' ? 'LLC' : 'LLC',
             status: 'DRAFT',
           },
         } : undefined,
@@ -69,6 +73,7 @@ export async function POST(req: Request) {
           id: user.id,
           email: user.email,
           name: user.name,
+          serviceType: user.serviceType,
         },
       },
       { status: 201 }
