@@ -44,8 +44,23 @@ export async function POST(req: Request) {
             status: 'DRAFT',
           },
         } : undefined,
+        onboarding: {
+          create: {
+            completionPercentage: 0,
+            currentStep: 'welcome',
+          },
+        },
       },
     })
+
+    // Send welcome email asynchronously
+    try {
+      const { sendWelcomeEmail } = await import('@/lib/services/onboarding-email')
+      await sendWelcomeEmail(user.id)
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError)
+      // Don't fail registration if email fails
+    }
 
     return NextResponse.json(
       {

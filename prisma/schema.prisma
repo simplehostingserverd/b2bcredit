@@ -23,6 +23,8 @@ model User {
   // Relations
   applications  Application[]
   assignedLeads Lead[]     @relation("AssignedTo")
+  onboarding    OnboardingProfile?
+  emailDrips    EmailDrip[]
 
   @@map("users")
 }
@@ -109,4 +111,83 @@ model Document {
   application     Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
 
   @@map("documents")
+}
+
+model OnboardingProfile {
+  id                    String    @id @default(cuid())
+  userId                String    @unique
+
+  // Progress tracking
+  completionPercentage  Int       @default(0)
+  currentStep           String    @default("welcome")
+  isCompleted           Boolean   @default(false)
+
+  // Question responses - Day 0-1
+  businessType          String?
+  yearsInOperation      String?
+  currentCreditScore    String?
+
+  // Day 1-2
+  einUploaded           Boolean   @default(false)
+  einNumber             String?
+
+  // Day 2-3
+  bankConnected         Boolean   @default(false)
+  tradeLines            String?
+  creditGoal            String?
+  painPoints            String[]  @default([])
+
+  // Day 4
+  preferredCommunication String?  @default("email")
+  referralSource        String?
+
+  // Day 5-7
+  budgetForPremium      String?
+  teamSize              String?
+
+  // Timestamps
+  welcomeEmailSentAt    DateTime?
+  day1EmailSentAt       DateTime?
+  day2EmailSentAt       DateTime?
+  day3EmailSentAt       DateTime?
+  day4EmailSentAt       DateTime?
+  day5EmailSentAt       DateTime?
+  day7EmailSentAt       DateTime?
+  day10EmailSentAt      DateTime?
+
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  // Relations
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("onboarding_profiles")
+}
+
+model EmailDrip {
+  id                String    @id @default(cuid())
+  userId            String
+
+  // Email details
+  emailType         String    // "welcome", "day1_education", "day2_nudge", etc.
+  subject           String
+  sentAt            DateTime  @default(now())
+  opened            Boolean   @default(false)
+  openedAt          DateTime?
+  clicked           Boolean   @default(false)
+  clickedAt         DateTime?
+
+  // Tracking
+  scheduledFor      DateTime?
+  status            String    @default("sent") // "scheduled", "sent", "failed"
+
+  createdAt         DateTime  @default(now())
+
+  // Relations
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("email_drips")
+  @@index([userId])
+  @@index([emailType])
+  @@index([scheduledFor])
 }

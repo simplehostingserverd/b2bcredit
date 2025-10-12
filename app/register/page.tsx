@@ -38,8 +38,8 @@ export default function RegisterPage() {
         return
       }
 
-      // Registration successful, redirect to login
-      router.push('/login?registered=true')
+      // Registration successful, redirect to onboarding
+      router.push('/onboarding/step-1')
     } catch (error) {
       setError('Something went wrong')
       setIsLoading(false)
