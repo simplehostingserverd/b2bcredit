@@ -4,7 +4,7 @@ import { Button } from '@/components/Button'
 
 export default function Home() {
   return (
-    <div className="min-h-screen gradient-bg stars-bg">
+    <div className="min-h-screen stars-bg">
       <Navbar />
 
       {/* Hero Section */}
@@ -17,13 +17,18 @@ export default function Home() {
             <h1 className="text-5xl md:text-7xl font-bold mb-6 text-glow">
               Redefining the Future of <br />Business Finance
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-white/80 max-w-3xl mx-auto">
-              Experience the future of finance with Uneon, where innovative solutions help you manage & grow your business with financial clarity.
+            <p className="text-xl md:text-2xl mb-8 text-white/80 max-w-4xl mx-auto">
+              From automated business formation to funding solutions - we help entrepreneurs at every stage of their journey
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/register">
+              <Link href="/services">
                 <Button size="lg" className="bg-white text-purple-900 hover:bg-white/90 btn-glow px-8 py-4 text-lg font-semibold">
-                  Get Started
+                  Explore Our Services
+                </Button>
+              </Link>
+              <Link href="/register">
+                <Button size="lg" variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-4 text-lg font-semibold">
+                  Get Started Free
                 </Button>
               </Link>
             </div>
@@ -32,6 +37,119 @@ export default function Home() {
           {/* Decorative elements */}
           <div className="absolute top-20 left-10 w-32 h-32 bg-purple-500/20 rounded-full blur-3xl"></div>
           <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl"></div>
+        </div>
+      </section>
+
+      {/* Two Main Services */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+              Two Powerful Solutions for Your Business
+            </h2>
+            <p className="text-xl text-white/70">
+              Whether you're starting fresh or scaling up, we've got you covered
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Automated Business Formation */}
+            <div className="card-dark rounded-2xl p-10 hover:scale-105 transition-all duration-300 border-2 border-purple-500/30">
+              <div className="flex items-center gap-2 mb-6">
+                <div className="text-purple-400">
+                  <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+                <span className="bg-purple-500/20 text-purple-300 px-3 py-1 rounded-full text-sm font-semibold">
+                  MOST POPULAR
+                </span>
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-4">
+                Automated Business Formation
+              </h3>
+              <p className="text-white/70 text-lg mb-6">
+                Starting from scratch? We automate the entire process - from company formation to funding applications.
+              </p>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start">
+                  <svg className="w-6 h-6 text-purple-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/80">Automated company registration & structure</span>
+                </li>
+                <li className="flex items-start">
+                  <svg className="w-6 h-6 text-purple-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/80">EIN, licenses, and business accounts setup</span>
+                </li>
+                <li className="flex items-start">
+                  <svg className="w-6 h-6 text-purple-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/80">Business credit profile creation</span>
+                </li>
+                <li className="flex items-start">
+                  <svg className="w-6 h-6 text-purple-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/80">Startup funding applications & guidance</span>
+                </li>
+              </ul>
+              <Link href="/register">
+                <Button className="w-full bg-white text-purple-900 hover:bg-white/90 btn-glow">
+                  Start Your Business
+                </Button>
+              </Link>
+            </div>
+
+            {/* Business Funding */}
+            <div className="card-dark rounded-2xl p-10 hover:scale-105 transition-all duration-300">
+              <div className="text-purple-400 mb-6">
+                <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <h3 className="text-3xl font-bold text-white mb-4">
+                Business Funding Solutions
+              </h3>
+              <p className="text-white/70 text-lg mb-6">
+                Already have a business? Get access to the funding you need to grow and scale.
+              </p>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start">
+                  <svg className="w-6 h-6 text-purple-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/80">Business expansion funding</span>
+                </li>
+                <li className="flex items-start">
+                  <svg className="w-6 h-6 text-purple-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/80">Working capital & credit lines</span>
+                </li>
+                <li className="flex items-start">
+                  <svg className="w-6 h-6 text-purple-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/80">Equipment & inventory financing</span>
+                </li>
+                <li className="flex items-start">
+                  <svg className="w-6 h-6 text-purple-400 mr-3 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span className="text-white/80">Expert guidance & rate comparison</span>
+                </li>
+              </ul>
+              <Link href="/register">
+                <Button className="w-full bg-purple-500 text-white hover:bg-purple-600 btn-glow">
+                  Get Funding
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 

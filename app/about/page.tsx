@@ -4,7 +4,7 @@ import { Button } from '@/components/Button'
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen gradient-bg stars-bg">
+    <div className="min-h-screen stars-bg">
       <Navbar />
 
       {/* Hero Section */}

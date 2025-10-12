@@ -51,86 +51,110 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen stars-bg flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <Link href="/" className="flex justify-center">
-          <span className="text-3xl font-bold text-primary-600">B2B Credit</span>
+          <span className="text-3xl font-bold text-white">B2B Credit</span>
         </Link>
-        <h2 className="mt-6 text-center text-3xl font-bold text-gray-900">
+        <h2 className="mt-6 text-center text-3xl font-bold text-white">
           Create your account
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
+        <p className="mt-2 text-center text-sm text-white/70">
           Already have an account?{' '}
-          <Link href="/login" className="font-medium text-primary-600 hover:text-primary-500">
+          <Link href="/login" className="font-medium text-purple-300 hover:text-purple-200">
             Sign in
           </Link>
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <Card>
+        <div className="card-dark rounded-2xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-lg">
+              <div className="bg-red-500/20 border border-red-500/30 text-red-300 px-4 py-3 rounded-lg">
                 {error}
               </div>
             )}
 
-            <Input
-              label="Full Name"
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              autoComplete="name"
-            />
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-white mb-2">
+                Full Name
+              </label>
+              <Input
+                id="name"
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                autoComplete="name"
+                className="w-full bg-white/5 border-white/10 text-white placeholder-white/40"
+              />
+            </div>
 
-            <Input
-              label="Business Name"
-              type="text"
-              name="businessName"
-              value={formData.businessName}
-              onChange={handleChange}
-              required
-            />
+            <div>
+              <label htmlFor="businessName" className="block text-sm font-medium text-white mb-2">
+                Business Name
+              </label>
+              <Input
+                id="businessName"
+                type="text"
+                name="businessName"
+                value={formData.businessName}
+                onChange={handleChange}
+                required
+                className="w-full bg-white/5 border-white/10 text-white placeholder-white/40"
+              />
+            </div>
 
-            <Input
-              label="Email address"
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              autoComplete="email"
-            />
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+                Email address
+              </label>
+              <Input
+                id="email"
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                autoComplete="email"
+                className="w-full bg-white/5 border-white/10 text-white placeholder-white/40"
+              />
+            </div>
 
-            <Input
-              label="Password"
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              required
-              autoComplete="new-password"
-            />
+            <div>
+              <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
+                Password
+              </label>
+              <Input
+                id="password"
+                type="password"
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
+                required
+                autoComplete="new-password"
+                className="w-full bg-white/5 border-white/10 text-white placeholder-white/40"
+              />
+            </div>
 
-            <div className="text-xs text-gray-600">
+            <div className="text-xs text-white/70">
               By creating an account, you agree to our{' '}
-              <a href="#" className="text-primary-600 hover:text-primary-500">
+              <a href="#" className="text-purple-300 hover:text-purple-200">
                 Terms of Service
               </a>{' '}
               and{' '}
-              <a href="#" className="text-primary-600 hover:text-primary-500">
+              <a href="#" className="text-purple-300 hover:text-purple-200">
                 Privacy Policy
               </a>
             </div>
 
-            <Button type="submit" className="w-full" isLoading={isLoading}>
+            <Button type="submit" className="w-full bg-white text-purple-900 hover:bg-white/90 btn-glow" isLoading={isLoading}>
               Create Account
             </Button>
           </form>
-        </Card>
+        </div>
       </div>
     </div>
   )

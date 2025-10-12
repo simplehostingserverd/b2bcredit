@@ -74,7 +74,7 @@ export default function AdminDashboard() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen gradient-bg stars-bg">
+      <div className="min-h-screen stars-bg">
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
@@ -96,7 +96,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen gradient-bg stars-bg">
+    <div className="min-h-screen stars-bg">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
