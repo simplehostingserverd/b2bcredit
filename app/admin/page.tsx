@@ -57,29 +57,29 @@ export default function AdminDashboard() {
 
   const getStatusColor = (status: string) => {
     const colors: any = {
-      DRAFT: 'bg-gray-100 text-gray-800',
-      SUBMITTED: 'bg-blue-100 text-blue-800',
-      UNDER_REVIEW: 'bg-yellow-100 text-yellow-800',
-      APPROVED: 'bg-green-100 text-green-800',
-      REJECTED: 'bg-red-100 text-red-800',
-      FUNDED: 'bg-purple-100 text-purple-800',
-      NEW: 'bg-blue-100 text-blue-800',
-      CONTACTED: 'bg-yellow-100 text-yellow-800',
-      QUALIFIED: 'bg-green-100 text-green-800',
-      CONVERTED: 'bg-purple-100 text-purple-800',
-      LOST: 'bg-red-100 text-red-800',
+      DRAFT: 'bg-gray-500/20 text-gray-300 border border-gray-500/30',
+      SUBMITTED: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
+      UNDER_REVIEW: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
+      APPROVED: 'bg-green-500/20 text-green-300 border border-green-500/30',
+      REJECTED: 'bg-red-500/20 text-red-300 border border-red-500/30',
+      FUNDED: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
+      NEW: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
+      CONTACTED: 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
+      QUALIFIED: 'bg-green-500/20 text-green-300 border border-green-500/30',
+      CONVERTED: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
+      LOST: 'bg-red-500/20 text-red-300 border border-red-500/30',
     }
     return colors[status] || colors.DRAFT
   }
 
   if (status === 'loading' || loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen gradient-bg stars-bg">
         <Navbar />
         <div className="max-w-7xl mx-auto px-4 py-8">
           <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-            <div className="h-48 bg-gray-200 rounded"></div>
+            <div className="h-8 bg-white/10 rounded w-1/4"></div>
+            <div className="h-48 bg-white/10 rounded"></div>
           </div>
         </div>
       </div>
@@ -96,91 +96,92 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen gradient-bg stars-bg">
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
+          <p className="text-white/70 mt-2">
             Manage applications and leads
           </p>
         </div>
 
         {/* Stats Grid */}
         <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
-          <Card className="text-center">
-            <p className="text-sm text-gray-600">Total Applications</p>
-            <p className="text-3xl font-bold text-gray-900">{stats.totalApplications}</p>
-          </Card>
-          <Card className="text-center">
-            <p className="text-sm text-gray-600">Pending Review</p>
-            <p className="text-3xl font-bold text-blue-600">{stats.submitted}</p>
-          </Card>
-          <Card className="text-center">
-            <p className="text-sm text-gray-600">Approved</p>
-            <p className="text-3xl font-bold text-green-600">{stats.approved}</p>
-          </Card>
-          <Card className="text-center">
-            <p className="text-sm text-gray-600">Total Leads</p>
-            <p className="text-3xl font-bold text-gray-900">{stats.totalLeads}</p>
-          </Card>
-          <Card className="text-center">
-            <p className="text-sm text-gray-600">New Leads</p>
-            <p className="text-3xl font-bold text-blue-600">{stats.newLeads}</p>
-          </Card>
-          <Card className="text-center">
-            <p className="text-sm text-gray-600">Qualified</p>
-            <p className="text-3xl font-bold text-green-600">{stats.qualified}</p>
-          </Card>
+          <div className="card-dark rounded-xl p-4 text-center">
+            <p className="text-sm text-white/70">Total Applications</p>
+            <p className="text-3xl font-bold text-white">{stats.totalApplications}</p>
+          </div>
+          <div className="card-dark rounded-xl p-4 text-center">
+            <p className="text-sm text-white/70">Pending Review</p>
+            <p className="text-3xl font-bold text-blue-400">{stats.submitted}</p>
+          </div>
+          <div className="card-dark rounded-xl p-4 text-center">
+            <p className="text-sm text-white/70">Approved</p>
+            <p className="text-3xl font-bold text-green-400">{stats.approved}</p>
+          </div>
+          <div className="card-dark rounded-xl p-4 text-center">
+            <p className="text-sm text-white/70">Total Leads</p>
+            <p className="text-3xl font-bold text-white">{stats.totalLeads}</p>
+          </div>
+          <div className="card-dark rounded-xl p-4 text-center">
+            <p className="text-sm text-white/70">New Leads</p>
+            <p className="text-3xl font-bold text-blue-400">{stats.newLeads}</p>
+          </div>
+          <div className="card-dark rounded-xl p-4 text-center">
+            <p className="text-sm text-white/70">Qualified</p>
+            <p className="text-3xl font-bold text-green-400">{stats.qualified}</p>
+          </div>
         </div>
 
         {/* Recent Applications */}
-        <Card title="Recent Applications" className="mb-8">
+        <div className="card-dark rounded-2xl p-6 mb-8">
+          <h2 className="text-2xl font-bold text-white mb-6">Recent Applications</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-white/10">
               <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Business
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Contact
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Funding Amount
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Submitted
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-white/10">
                 {applications.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-4 text-center text-white/70">
                       No applications yet
                     </td>
                   </tr>
                 ) : (
                   applications.slice(0, 10).map((app) => (
-                    <tr key={app.id} className="hover:bg-gray-50">
+                    <tr key={app.id} className="hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-white">
                           {app.businessName}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-white/70">
                           {app.businessType.replace('_', ' ')}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{app.user.name}</div>
-                        <div className="text-sm text-gray-500">{app.user.email}</div>
+                        <div className="text-sm text-white">{app.user.name}</div>
+                        <div className="text-sm text-white/70">{app.user.email}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                         {app.fundingAmount
                           ? `$${app.fundingAmount.toLocaleString()}`
                           : 'N/A'}
@@ -190,7 +191,7 @@ export default function AdminDashboard() {
                           {app.status.replace('_', ' ')}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
                         {app.submittedAt
                           ? new Date(app.submittedAt).toLocaleDateString()
                           : 'Not submitted'}
@@ -201,51 +202,52 @@ export default function AdminDashboard() {
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
 
         {/* Recent Leads */}
-        <Card title="Recent Leads">
+        <div className="card-dark rounded-2xl p-6">
+          <h2 className="text-2xl font-bold text-white mb-6">Recent Leads</h2>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-white/10">
               <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Business
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Contact
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Industry
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-white/70 uppercase tracking-wider">
                     Created
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y divide-white/10">
                 {leads.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td colSpan={5} className="px-6 py-4 text-center text-white/70">
                       No leads yet
                     </td>
                   </tr>
                 ) : (
                   leads.slice(0, 10).map((lead) => (
-                    <tr key={lead.id} className="hover:bg-gray-50">
+                    <tr key={lead.id} className="hover:bg-white/5 transition-colors">
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-white">
                           {lead.businessName}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">{lead.contactName}</div>
-                        <div className="text-sm text-gray-500">{lead.email}</div>
+                        <div className="text-sm text-white">{lead.contactName}</div>
+                        <div className="text-sm text-white/70">{lead.email}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
                         {lead.industry || 'N/A'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -253,7 +255,7 @@ export default function AdminDashboard() {
                           {lead.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white/70">
                         {new Date(lead.createdAt).toLocaleDateString()}
                       </td>
                     </tr>
@@ -262,7 +264,7 @@ export default function AdminDashboard() {
               </tbody>
             </table>
           </div>
-        </Card>
+        </div>
       </div>
     </div>
   )

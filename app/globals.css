@@ -13,3 +13,65 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .gradient-bg {
+    background: linear-gradient(135deg, #0f1729 0%, #1a1f3a 25%, #2d1b69 50%, #1a1f3a 75%, #0f1729 100%);
+    position: relative;
+  }
+
+  .gradient-bg-alt {
+    background: linear-gradient(180deg, #0a0e1a 0%, #1a1f3a 50%, #2d1b69 100%);
+  }
+
+  .stars-bg {
+    background-image:
+      radial-gradient(2px 2px at 20% 30%, white, transparent),
+      radial-gradient(2px 2px at 60% 70%, white, transparent),
+      radial-gradient(1px 1px at 50% 50%, white, transparent),
+      radial-gradient(1px 1px at 80% 10%, white, transparent),
+      radial-gradient(2px 2px at 90% 60%, white, transparent),
+      radial-gradient(1px 1px at 33% 85%, white, transparent),
+      radial-gradient(1px 1px at 15% 65%, white, transparent);
+    background-size: 200% 200%;
+    animation: stars 8s ease-in-out infinite;
+  }
+
+  @keyframes stars {
+    0%, 100% {
+      background-position: 0% 0%, 100% 100%, 50% 50%, 80% 10%, 90% 60%, 33% 85%, 15% 65%;
+    }
+    50% {
+      background-position: 100% 100%, 0% 0%, 60% 40%, 70% 20%, 80% 50%, 43% 95%, 25% 55%;
+    }
+  }
+
+  .glow-effect {
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3), 0 0 40px rgba(139, 92, 246, 0.2);
+  }
+
+  .card-dark {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .card-dark:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+  }
+
+  .btn-glow {
+    box-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+    transition: all 0.3s ease;
+  }
+
+  .btn-glow:hover {
+    box-shadow: 0 0 25px rgba(139, 92, 246, 0.7);
+    transform: translateY(-2px);
+  }
+}
