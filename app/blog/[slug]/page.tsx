@@ -105,11 +105,6 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   try {
     const { slug } = await params
 
-    // If baseUrl is still localhost and we're in development, skip API call to avoid fetch errors
-    if (baseUrl === 'http://localhost:3000' && process.env.NODE_ENV === 'development') {
-      console.log('Development mode: Skipping API call for blog post')
-      throw new Error('Development mode - no database configured')
-    }
 
     const response = await fetch(`${baseUrl}/api/blog/${slug}`, {
       next: { revalidate: 3600 }
