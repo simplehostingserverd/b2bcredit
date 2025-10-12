@@ -119,7 +119,7 @@ export default function BlogPage() {
             Want to stay updated with our latest content?
           </p>
           <Link href="/register">
-            <button className="bg-white text-purple-900 hover:bg-white/90 btn-glow px-8 py-3 rounded-lg font-semibold">
+            <button className="bg-purple-600 text-white hover:bg-purple-700 btn-glow px-8 py-3 rounded-lg font-semibold">
               Subscribe to Updates
             </button>
           </Link>

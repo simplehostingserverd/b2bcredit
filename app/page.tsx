@@ -22,7 +22,7 @@ export default function Home() {
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
               <Link href="/services">
-                <Button size="lg" className="bg-white text-purple-900 hover:bg-white/90 btn-glow px-8 py-4 text-lg font-semibold">
+                <Button size="lg" className="bg-purple-600 text-white hover:bg-purple-700 btn-glow px-8 py-4 text-lg font-semibold border-2 border-purple-400">
                   Explore Our Services
                 </Button>
               </Link>
@@ -98,7 +98,7 @@ export default function Home() {
                 </li>
               </ul>
               <Link href="/register">
-                <Button className="w-full bg-white text-purple-900 hover:bg-white/90 btn-glow">
+                <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 btn-glow">
                   Start Your Business
                 </Button>
               </Link>
@@ -261,7 +261,7 @@ export default function Home() {
             Join hundreds of businesses that have simplified their funding journey
           </p>
           <Link href="/register">
-            <Button size="lg" className="bg-white text-purple-900 hover:bg-white/90 btn-glow px-8 py-4 text-lg font-semibold">
+            <Button size="lg" className="bg-purple-600 text-white hover:bg-purple-700 btn-glow px-8 py-4 text-lg font-semibold border-2 border-purple-400">
               Get Started Today
             </Button>
           </Link>

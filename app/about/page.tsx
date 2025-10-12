@@ -118,7 +118,7 @@ export default function AboutPage() {
             Join the businesses that trust B2B Credit Builder for their funding needs
           </p>
           <Link href="/register">
-            <Button size="lg" className="bg-white text-purple-900 hover:bg-white/90 btn-glow px-8 py-4 text-lg font-semibold">
+            <Button size="lg" className="bg-purple-600 text-white hover:bg-purple-700 btn-glow px-8 py-4 text-lg font-semibold">
               Start Your Application
             </Button>
           </Link>

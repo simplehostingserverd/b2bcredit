@@ -150,7 +150,7 @@ export default function RegisterPage() {
               </a>
             </div>
 
-            <Button type="submit" className="w-full bg-white text-purple-900 hover:bg-white/90 btn-glow" isLoading={isLoading}>
+            <Button type="submit" className="w-full bg-purple-600 text-white hover:bg-purple-700 btn-glow" isLoading={isLoading}>
               Create Account
             </Button>
           </form>

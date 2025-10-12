@@ -79,7 +79,7 @@ export default function ServicesPage() {
                 </li>
               </ul>
               <Link href="/register">
-                <Button className="w-full bg-white text-purple-900 hover:bg-white/90 btn-glow">
+                <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 btn-glow">
                   Get Funding for Your Business
                 </Button>
               </Link>
@@ -149,7 +149,7 @@ export default function ServicesPage() {
                 </li>
               </ul>
               <Link href="/register">
-                <Button className="w-full bg-white text-purple-900 hover:bg-white/90 btn-glow">
+                <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 btn-glow">
                   Start Building Your Business
                 </Button>
               </Link>
@@ -208,7 +208,7 @@ export default function ServicesPage() {
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/register">
-              <Button size="lg" className="bg-white text-purple-900 hover:bg-white/90 btn-glow px-8 py-4 text-lg font-semibold">
+              <Button size="lg" className="bg-purple-600 text-white hover:bg-purple-700 btn-glow px-8 py-4 text-lg font-semibold border-2 border-purple-400">
                 Get Started Now
               </Button>
             </Link>

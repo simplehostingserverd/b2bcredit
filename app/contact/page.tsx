@@ -119,7 +119,7 @@ export default function ContactPage() {
                   Create your account and begin your application in minutes.
                 </p>
                 <Link href="/register">
-                  <Button className="w-full bg-white text-purple-900 hover:bg-white/90 btn-glow">
+                  <Button className="w-full bg-purple-600 text-white hover:bg-purple-700 btn-glow">
                     Start Your Application
                   </Button>
                 </Link>
@@ -219,7 +219,7 @@ export default function ContactPage() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-white text-purple-900 hover:bg-white/90 btn-glow"
+                  className="w-full bg-purple-600 text-white hover:bg-purple-700 btn-glow"
                 >
                   Send Message
                 </Button>

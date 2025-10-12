@@ -146,7 +146,7 @@ export default function DashboardPage() {
               Our streamlined process makes it easy to apply for the capital you need.
             </p>
             <Link href="/application">
-              <Button size="lg" className="bg-white text-purple-900 hover:bg-white/90 btn-glow">Start Application</Button>
+              <Button size="lg" className="bg-purple-600 text-white hover:bg-purple-700 btn-glow">Start Application</Button>
             </Link>
           </div>
         ) : (
@@ -182,7 +182,7 @@ export default function DashboardPage() {
                     {application.status === 'DRAFT' && (
                       <>
                         <Link href="/application">
-                          <Button className="bg-white text-purple-900 hover:bg-white/90 btn-glow">Continue Application</Button>
+                          <Button className="bg-purple-600 text-white hover:bg-purple-700 btn-glow">Continue Application</Button>
                         </Link>
                         <Link href="/application/review">
                           <Button variant="outline" className="border-white/20 text-white hover:bg-white/10">Review & Submit</Button>

@@ -108,7 +108,7 @@ export default function FAQsPage() {
             Our team is here to help. Contact us and we'll get back to you within 24 hours.
           </p>
           <Link href="/contact">
-            <button className="bg-white text-purple-900 hover:bg-white/90 btn-glow px-8 py-3 rounded-lg font-semibold">
+            <button className="bg-purple-600 text-white hover:bg-purple-700 btn-glow px-8 py-3 rounded-lg font-semibold">
               Contact Support
             </button>
           </Link>
