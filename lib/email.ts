@@ -30,7 +30,7 @@ export async function sendEmail({ to, subject, html, from }: EmailOptions) {
     })
 
     console.log('✅ Email sent:', data)
-    return { success: true, messageId: data.id }
+    return { success: true, messageId: data.data?.id }
   } catch (error) {
     console.error('❌ Email error:', error)
     return { success: false, error }
