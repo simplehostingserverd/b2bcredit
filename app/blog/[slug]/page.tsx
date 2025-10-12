@@ -30,16 +30,27 @@ interface BlogPost {
 }
 
 // Generate metadata for SEO
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://your-domain.com'
-    const response = await fetch(`${baseUrl}/api/blog/${params.slug}`, {
+    const { slug } = await params
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+    // If baseUrl is still the default, we're likely in development without proper env setup
+    if (baseUrl === 'http://localhost:3000' && process.env.NODE_ENV === 'development') {
+      return {
+        title: `${slug} | B2B Credit Builder`,
+        description: 'Business funding and credit building solutions for entrepreneurs',
+      }
+    }
+
+    const response = await fetch(`${baseUrl}/api/blog/${slug}`, {
       next: { revalidate: 3600 } // Revalidate every hour
     })
 
     if (!response.ok) {
       return {
-        title: 'Blog Post Not Found | B2B Credit Builder'
+        title: 'Blog Post Not Found | B2B Credit Builder',
+        description: 'The requested blog post could not be found',
       }
     }
 
@@ -82,16 +93,25 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   } catch (error) {
     console.error('Error generating metadata:', error)
     return {
-      title: 'Blog | B2B Credit Builder'
+      title: 'Blog | B2B Credit Builder',
+      description: 'Business funding and credit building solutions for entrepreneurs',
     }
   }
 }
 
-export default async function BlogPostPage({ params }: { params: { slug: string } }) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://your-domain.com'
+export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
   try {
-    const response = await fetch(`${baseUrl}/api/blog/${params.slug}`, {
+    const { slug } = await params
+
+    // If baseUrl is still localhost and we're in development, skip API call to avoid fetch errors
+    if (baseUrl === 'http://localhost:3000' && process.env.NODE_ENV === 'development') {
+      console.log('Development mode: Skipping API call for blog post')
+      throw new Error('Development mode - no database configured')
+    }
+
+    const response = await fetch(`${baseUrl}/api/blog/${slug}`, {
       next: { revalidate: 3600 }
     })
 
@@ -247,7 +267,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
 
               {/* Related Posts */}
               <div className="mt-12">
-                <RelatedPosts currentSlug={params.slug} />
+                <RelatedPosts currentSlug={slug} />
               </div>
 
               {/* Newsletter Signup */}

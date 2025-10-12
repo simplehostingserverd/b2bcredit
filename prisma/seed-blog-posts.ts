@@ -163,7 +163,7 @@ While this guide provides a solid foundation, every business is unique. Consider
 ---
 
 *Need help choosing the right business structure? Our experts can guide you through the process and handle your formation paperwork.*`,
-    featuredImage: '/blog/business-structure.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1551836022-deb4988cc6c0?w=1200&h=630&fit=crop&crop=center',
     tags: ['business formation', 'LLC', 'startup', 'business structure', 'Wyoming LLC'],
     categoryId: null, // Will be set after creating categories
     status: 'PUBLISHED',
@@ -371,7 +371,7 @@ Consider working with experts who can:
 ---
 
 *Building business credit takes time and discipline, but the rewards are substantial. Start today and watch your business funding options expand.*`,
-    featuredImage: '/blog/business-credit.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&h=630&fit=crop&crop=center',
     tags: ['business credit', 'startup funding', 'credit building', 'business finance', 'vendor credit'],
     categoryId: null,
     status: 'PUBLISHED',
@@ -635,7 +635,7 @@ Don't navigate the document maze alone. Consider:
 ---
 
 *Proper documentation is the foundation of a successful business. Take the time to get it right from the beginning.*`,
-    featuredImage: '/blog/business-documents.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&h=630&fit=crop&crop=center',
     tags: ['business documents', 'legal requirements', 'compliance', 'business formation', 'startup checklist'],
     categoryId: null,
     status: 'PUBLISHED',
@@ -958,7 +958,7 @@ Consider working with experts who can:
 ---
 
 *Funding is a journey, not a destination. Choose the right path for your business and be prepared for the road ahead.*`,
-    featuredImage: '/blog/funding-options.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=1200&h=630&fit=crop&crop=center',
     tags: ['startup funding', 'business loans', 'venture capital', 'angel investors', 'SBA loans'],
     categoryId: null,
     status: 'PUBLISHED',
@@ -1254,7 +1254,7 @@ Consider using professional services for:
 ---
 
 *Wyoming LLCs offer the perfect combination of tax benefits, privacy protection, and operational simplicity for modern entrepreneurs.*`,
-    featuredImage: '/blog/wyoming-llc.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1200&h=630&fit=crop&crop=center',
     tags: ['Wyoming LLC', 'business formation', 'tax advantages', 'privacy protection', 'asset protection'],
     categoryId: null,
     status: 'PUBLISHED',
@@ -1595,7 +1595,7 @@ Hiring your first employee is a major milestone for any business owner. This com
 ---
 
 *Hiring your first employee is exciting but comes with significant responsibilities. Proper preparation ensures success for both you and your new team member.*`,
-    featuredImage: '/blog/hiring-guide.jpg',
+    featuredImage: 'https://images.unsplash.com/photo-1521791136064-7986c2920216?w=1200&h=630&fit=crop&crop=center',
     tags: ['hiring employees', 'small business', 'payroll', 'HR compliance', 'employee management'],
     categoryId: null,
     status: 'PUBLISHED',
