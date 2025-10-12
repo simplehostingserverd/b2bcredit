@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String?
+  role          String    @default("CLIENT")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  applications  Application[]
+  assignedLeads Lead[]     @relation("AssignedTo")
+
+  @@map("users")
+}
+
+model Lead {
+  id                String       @id @default(cuid())
+  businessName      String
+  contactName       String
+  email             String
+  phone             String?
+  industry          String?
+  yearsInBusiness   Int?
+  annualRevenue     Float?
+  status            String       @default("NEW")
+  source            String?
+  notes             String?
+  assignedToId      String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  // Relations
+  assignedTo        User?        @relation("AssignedTo", fields: [assignedToId], references: [id])
+  application       Application?
+
+  @@map("leads")
+}
+
+model Application {
+  id                    String            @id @default(cuid())
+  userId                String            @unique
+  leadId                String?           @unique
+
+  // Business Information
+  businessName          String
+  businessType          String
+  ein                   String?
+  dateEstablished       DateTime?
+  businessAddress       String?
+  businessCity          String?
+  businessState         String?
+  businessZip           String?
+  industry              String?
+
+  // Financial Information
+  annualRevenue         Float?
+  monthlyRevenue        Float?
+  creditScore           Int?
+  existingDebt          Float?
+
+  // Funding Request
+  fundingAmount         Float?
+  fundingPurpose        String?
+
+  // Status
+  status                String            @default("DRAFT")
+  submittedAt           DateTime?
+  reviewedAt            DateTime?
+  approvedAt            DateTime?
+  rejectedAt            DateTime?
+  rejectionReason       String?
+
+  // Documents
+  documents             Document[]
+
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+
+  // Relations
+  user                  User              @relation(fields: [userId], references: [id])
+  lead                  Lead?             @relation(fields: [leadId], references: [id])
+
+  @@map("applications")
+}
+
+model Document {
+  id              String      @id @default(cuid())
+  applicationId   String
+  name            String
+  type            String
+  url             String
+  uploadedAt      DateTime    @default(now())
+
+  // Relations
+  application     Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@map("documents")
+}
