@@ -48,3 +48,4 @@ prisma/*.db-journal
 *.md
 FEATURES.md
 QUICK_START.md
+COOLIFY_DEPLOYMENT.md

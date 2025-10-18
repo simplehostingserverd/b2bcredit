@@ -34,10 +34,10 @@ async function triggerN8nAutomation(event: string, data: any) {
 // GET /api/blog/[slug] - Get a specific blog post
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params
+    const { slug } = await params
 
     const post = await prisma.blogPost.findUnique({
       where: { slug },
@@ -92,7 +92,7 @@ export async function GET(
 // PUT /api/blog/[slug] - Update a blog post (Admin only)
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -104,7 +104,7 @@ export async function PUT(
       )
     }
 
-    const { slug } = params
+    const { slug } = await params
     const body = await request.json()
     const {
       title,
@@ -235,7 +235,7 @@ export async function PUT(
 // DELETE /api/blog/[slug] - Delete a blog post (Admin only)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -247,7 +247,7 @@ export async function DELETE(
       )
     }
 
-    const { slug } = params
+    const { slug } = await params
 
     const post = await prisma.blogPost.findUnique({
       where: { slug }

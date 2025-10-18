@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { wrapPublicRoute } from '@/lib/middleware/api-wrapper'
 
 const leadSchema = z.object({
   businessName: z.string().min(1),
@@ -14,7 +15,7 @@ const leadSchema = z.object({
   notes: z.string().optional(),
 })
 
-export async function POST(req: Request) {
+async function handler(req: Request) {
   try {
     const body = await req.json()
     const data = leadSchema.parse(body)
@@ -39,3 +40,6 @@ export async function POST(req: Request) {
     )
   }
 }
+
+// Export with public rate limiting (30 requests per minute)
+export const POST = wrapPublicRoute(handler)

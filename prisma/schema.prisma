@@ -271,3 +271,22 @@ model NewsletterSubscriber {
   @@index([isActive])
   @@index([source])
 }
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  userId      String
+  action      String   // CREATE, READ, UPDATE, DELETE, LOGIN, LOGOUT, EXPORT, BULK_DELETE
+  resource    String   // e.g., "User", "Application", "Lead"
+  resourceId  String
+  details     Json?    // Additional context about the action
+  ipAddress   String?
+  userAgent   String?
+
+  createdAt   DateTime @default(now())
+
+  @@map("audit_logs")
+  @@index([userId])
+  @@index([action])
+  @@index([resource])
+  @@index([createdAt])
+}

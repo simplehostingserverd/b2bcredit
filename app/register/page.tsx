@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { signIn } from 'next-auth/react'
 import Link from 'next/link'
 import { Input } from '@/components/Input'
 import { Button } from '@/components/Button'
@@ -45,8 +46,22 @@ export default function RegisterPage() {
         return
       }
 
-      // Registration successful, redirect to onboarding
+      // Registration successful, now sign in automatically
+      const signInResult = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      })
+
+      if (signInResult?.error) {
+        setError('Registration successful but sign-in failed. Please log in manually.')
+        setIsLoading(false)
+        return
+      }
+
+      // Successfully registered and signed in, redirect to onboarding
       router.push('/onboarding/step-1')
+      router.refresh()
     } catch (error) {
       setError('Something went wrong')
       setIsLoading(false)

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { hash } from 'bcryptjs'
 import { prisma } from '@/lib/prisma'
 import { z } from 'zod'
+import { wrapStrictRoute } from '@/lib/middleware/api-wrapper'
 
 const registerSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -13,7 +14,7 @@ const registerSchema = z.object({
   }),
 })
 
-export async function POST(req: Request) {
+async function handler(req: Request) {
   try {
     const body = await req.json()
     const { email, password, name, businessName, serviceType } = registerSchema.parse(body)
@@ -93,3 +94,6 @@ export async function POST(req: Request) {
     )
   }
 }
+
+// Export with strict rate limiting (10 requests per minute)
+export const POST = wrapStrictRoute(handler)

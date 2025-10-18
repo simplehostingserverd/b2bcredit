@@ -1,8 +1,12 @@
 import { MetadataRoute } from 'next'
 import { prisma } from '@/lib/prisma'
 
+// Force dynamic rendering to avoid build-time database access
+export const dynamic = 'force-dynamic'
+export const revalidate = 3600 // Revalidate every hour
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://your-domain.com'
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://your-domain.com'
 
   // Get all published blog posts
   const posts = await prisma.blogPost.findMany({

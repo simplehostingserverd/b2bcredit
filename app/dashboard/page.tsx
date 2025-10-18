@@ -12,6 +12,7 @@ export default function DashboardPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
   const [application, setApplication] = useState<any>(null)
+  const [onboarding, setOnboarding] = useState<any>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -21,22 +22,30 @@ export default function DashboardPage() {
   }, [status, router])
 
   useEffect(() => {
-    const fetchApplication = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/applications')
-        if (response.ok) {
-          const data = await response.json()
-          setApplication(data)
+        // Fetch application
+        const appResponse = await fetch('/api/applications')
+        if (appResponse.ok) {
+          const appData = await appResponse.json()
+          setApplication(appData)
+        }
+
+        // Fetch onboarding progress
+        const onboardingResponse = await fetch('/api/onboarding/progress')
+        if (onboardingResponse.ok) {
+          const onboardingData = await onboardingResponse.json()
+          setOnboarding(onboardingData.onboarding)
         }
       } catch (error) {
-        console.error('Error fetching application:', error)
+        console.error('Error fetching data:', error)
       } finally {
         setLoading(false)
       }
     }
 
     if (status === 'authenticated') {
-      fetchApplication()
+      fetchData()
     }
   }, [status])
 
@@ -76,9 +85,39 @@ export default function DashboardPage() {
             Welcome back, {session?.user?.name}!
           </h1>
           <p className="text-white/70 mt-2">
-            Manage your funding application and track your progress
+            {session?.user?.serviceType === 'formation'
+              ? 'Manage your business formation and track your progress'
+              : 'Manage your funding application and track your progress'}
           </p>
         </div>
+
+        {/* Onboarding Progress Banner - Only show if not completed */}
+        {onboarding && !onboarding.isCompleted && onboarding.completionPercentage < 100 && (
+          <div className="card-dark rounded-xl p-6 mb-6 border-2 border-purple-500/30">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1">Complete Your Profile</h3>
+                <p className="text-white/70 text-sm">
+                  Finish your onboarding to unlock all features and expedite your {session?.user?.serviceType === 'formation' ? 'business formation' : 'funding application'}
+                </p>
+              </div>
+              <Link href="/onboarding/step-1">
+                <Button className="bg-purple-600 text-white hover:bg-purple-700 btn-glow">
+                  Continue Setup
+                </Button>
+              </Link>
+            </div>
+            <div className="w-full bg-white/10 rounded-full h-2.5">
+              <div
+                className="bg-gradient-to-r from-purple-500 to-blue-500 h-2.5 rounded-full transition-all duration-500"
+                style={{ width: `${onboarding.completionPercentage}%` }}
+              ></div>
+            </div>
+            <p className="text-white/70 text-sm mt-2">
+              {onboarding.completionPercentage}% Complete
+            </p>
+          </div>
+        )}
 
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="card-dark rounded-xl p-6">
@@ -140,14 +179,29 @@ export default function DashboardPage() {
 
         {!application ? (
           <div className="card-dark rounded-2xl p-8">
-            <h2 className="text-2xl font-bold text-white mb-4">Get Started with Your Application</h2>
+            <h2 className="text-2xl font-bold text-white mb-4">
+              {session?.user?.serviceType === 'formation'
+                ? 'Get Started with Your Business Formation'
+                : 'Get Started with Your Funding Application'}
+            </h2>
             <p className="text-white/70 mb-6">
-              Begin your funding journey by completing your business application.
-              Our streamlined process makes it easy to apply for the capital you need.
+              {session?.user?.serviceType === 'formation'
+                ? 'Begin your business formation journey. Our automated system will handle everything from entity creation to EIN registration.'
+                : 'Begin your funding journey by completing your business application. Our streamlined process makes it easy to apply for the capital you need.'}
             </p>
-            <Link href="/application">
-              <Button size="lg" className="bg-purple-600 text-white hover:bg-purple-700 btn-glow">Start Application</Button>
-            </Link>
+            {onboarding && onboarding.isCompleted ? (
+              <Link href="/application">
+                <Button size="lg" className="bg-purple-600 text-white hover:bg-purple-700 btn-glow">
+                  Start Application
+                </Button>
+              </Link>
+            ) : (
+              <Link href="/onboarding/step-1">
+                <Button size="lg" className="bg-purple-600 text-white hover:bg-purple-700 btn-glow">
+                  Complete Onboarding First
+                </Button>
+              </Link>
+            )}
           </div>
         ) : (
           <div className="space-y-6">

@@ -4,10 +4,10 @@ import { prisma } from '@/lib/prisma'
 // GET /api/blog/[slug]/related - Get related blog posts
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: Promise<{ slug: string }> }
 ) {
   try {
-    const { slug } = params
+    const { slug } = await params
     const limit = 3 // Number of related posts to return
 
     // Get the current post to find related posts based on category and tags
