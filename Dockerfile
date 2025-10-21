@@ -44,9 +44,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Next.js standalone already includes most dependencies, but Prisma CLI needs additional modules
 COPY --from=builder /app/node_modules ./node_modules
 
-# Copy startup script
-COPY --chown=nextjs:nodejs scripts/start.sh ./start.sh
-RUN chmod +x ./start.sh
+# Copy scripts directory
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+RUN chmod +x ./scripts/start.sh
 
 USER nextjs
 
@@ -55,4 +55,4 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["./start.sh"]
+CMD ["./scripts/start.sh"]
