@@ -29,6 +29,9 @@ export function Navbar() {
               <Link href="/services" className="text-white/80 hover:text-white px-3 py-2 transition-colors">
                 Services
               </Link>
+              <Link href="/blog" className="text-white/80 hover:text-white px-3 py-2 transition-colors">
+                Blog
+              </Link>
               <Link href="/contact" className="text-white/80 hover:text-white px-3 py-2 transition-colors">
                 Contact
               </Link>
