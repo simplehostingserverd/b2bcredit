@@ -12,6 +12,9 @@ export default function AdminDashboard() {
   const [applications, setApplications] = useState<any[]>([])
   const [leads, setLeads] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [statusFilter, setStatusFilter] = useState('ALL')
+  const [leadStatusFilter, setLeadStatusFilter] = useState('ALL')
 
   useEffect(() => {
     if (status === 'unauthenticated') {
