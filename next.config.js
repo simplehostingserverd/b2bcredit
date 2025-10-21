@@ -17,6 +17,15 @@ const nextConfig = {
       },
     ],
   },
+  // Suppress Prisma Edge Runtime warnings
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.ignoreWarnings = [
+        { module: /node_modules\/@prisma\/client\/runtime\/wasm-engine-edge\.js/ },
+      ]
+    }
+    return config
+  },
   // Security headers for production
   async headers() {
     return [
