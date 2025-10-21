@@ -168,7 +168,11 @@ export default function AdminDashboard() {
                   </tr>
                 ) : (
                   applications.slice(0, 10).map((app) => (
-                    <tr key={app.id} className="hover:bg-white/5 transition-colors">
+                    <tr
+                      key={app.id}
+                      onClick={() => router.push(`/admin/applications/${app.id}`)}
+                      className="hover:bg-white/5 transition-colors cursor-pointer"
+                    >
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-white">
                           {app.businessName}

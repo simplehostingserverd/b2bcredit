@@ -37,7 +37,17 @@ export default function LoginPage() {
         if (typeof window !== 'undefined' && window.rybbit) {
           window.rybbit.event('user_logged_in', { method: 'credentials' })
         }
-        router.push('/dashboard')
+        
+        // Fetch session to check user role
+        const sessionResponse = await fetch('/api/auth/session')
+        const session = await sessionResponse.json()
+        
+        // Redirect based on role
+        if (session?.user?.role === 'ADMIN' || session?.user?.role === 'STAFF') {
+          router.push('/admin')
+        } else {
+          router.push('/dashboard')
+        }
         router.refresh()
       }
     } catch (error) {
