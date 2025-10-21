@@ -34,7 +34,60 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
   placeholder = 'Start writing your blog post...'
 }) => {
   const [isPreview, setIsPreview] = useState(false)
-  const [seoScore, setSeoScore] = useState(85)
+  const [seoScore, setSeoScore] = useState(0)
+  const [keywords, setKeywords] = useState('')
+  const [keywordSuggestions, setKeywordSuggestions] = useState<string[]>([])
+  const [isGeneratingPost, setIsGeneratingPost] = useState(false)
+  const [readabilityScore, setReadabilityScore] = useState(0)
+  const [tone, setTone] = useState('Neutral')
+
+  const fetchKeywordSuggestions = async (query: string) => {
+    if (query.length < 3) {
+      setKeywordSuggestions([])
+      return
+    }
+
+    try {
+      const response = await fetch('/api/ai/keywords', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query }),
+      })
+      if (response.ok) {
+        const data = await response.json()
+        setKeywordSuggestions(data.keywords || [])
+      }
+    } catch (error) {
+      console.error('Error fetching keyword suggestions:', error)
+    }
+  }
+
+  const generateAIPost = async () => {
+    if (!keywords || isGeneratingPost) return
+
+    setIsGeneratingPost(true)
+    try {
+      const response = await fetch('/api/ai/generate-post', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic: keywords }),
+      })
+
+      if (response.ok) {
+        const data = await response.json()
+        if (editor) {
+          editor.commands.setContent(data.post)
+        }
+      } else {
+        console.error('Failed to generate AI post')
+        // Optionally, show an error message to the user
+      }
+    } catch (error) {
+      console.error('Error generating AI post:', error)
+    } finally {
+      setIsGeneratingPost(false)
+    }
+  }
 
   const editor = useEditor({
     extensions: [
@@ -74,8 +127,12 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
     ],
     content,
     onUpdate: ({ editor }) => {
-      onChange(editor.getHTML())
-      calculateSEO(editor.getText())
+      const htmlContent = editor.getHTML()
+      const textContent = editor.getText()
+      onChange(htmlContent)
+      calculateSEO(textContent, keywords)
+      calculateReadability(textContent)
+      detectTone(textContent)
     },
     editorProps: {
       attributes: {
@@ -84,52 +141,53 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
     },
   })
 
-  const calculateSEO = useCallback((text: string) => {
+  const calculateSEO = useCallback((text: string, currentKeywords: string) => {
     let score = 0
     const words = text.split(' ').length
 
-    // Word count (aim for 1500+ words)
+    // Word count
     if (words >= 1500) score += 25
     else if (words >= 1000) score += 20
     else if (words >= 500) score += 15
     else score += 5
 
-    // Headings (H1, H2, H3 structure)
+    // Headings
     const h1Count = (text.match(/<h1>/g) || []).length
     const h2Count = (text.match(/<h2>/g) || []).length
     const h3Count = (text.match(/<h3>/g) || []).length
-
     if (h1Count === 1) score += 15
     if (h2Count >= 3) score += 15
     if (h3Count >= 5) score += 10
 
-    // Links (internal/external)
+    // Links
     const linkCount = (text.match(/<a /g) || []).length
     if (linkCount >= 3) score += 10
 
-    // Images (visual content)
+    // Images
     const imageCount = (text.match(/<img /g) || []).length
     if (imageCount >= 1) score += 5
 
-    // Lists (structured content)
+    // Lists
     const listCount = (text.match(/<(ul|ol)>/g) || []).length
     if (listCount >= 2) score += 5
 
-    // Keyword optimization (basic check)
-    const keywordDensity = calculateKeywordDensity(text)
-    if (keywordDensity >= 1 && keywordDensity <= 3) score += 10
+    // Keyword optimization
+    const keywordDensity = calculateKeywordDensity(text, currentKeywords)
+    if (keywordDensity >= 1 && keywordDensity <= 3) score += 15
+    else if (keywordDensity > 0) score += 5
 
     setSeoScore(Math.min(score, 100))
   }, [])
 
-  const calculateKeywordDensity = (text: string): number => {
-    // This is a simplified keyword density calculation
-    // In a real implementation, you'd analyze for target keywords
+  const calculateKeywordDensity = (text: string, currentKeywords: string): number => {
+    if (!currentKeywords) return 0
+
     const words = text.toLowerCase().split(/\s+/)
     const totalWords = words.length
+    const seoKeywords = currentKeywords.toLowerCase().split(',').map(k => k.trim()).filter(Boolean)
 
-    // Count common SEO keywords (simplified example)
-    const seoKeywords = ['business', 'credit', 'funding', 'startup', 'llc', 'company']
+    if (seoKeywords.length === 0) return 0
+
     const keywordCount = words.filter(word =>
       seoKeywords.some(keyword => word.includes(keyword))
     ).length
@@ -137,57 +195,65 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
     return totalWords > 0 ? (keywordCount / totalWords) * 100 : 0
   }
 
+  const calculateReadability = useCallback((text: string) => {
+    const sentences = text.split(/[.!?]+/).length - 1
+    const words = text.split(/\s+/).length
+    const syllables = text.split(/\s+/).reduce((acc, word) => acc + countSyllables(word), 0)
+
+    if (sentences === 0 || words === 0) {
+      setReadabilityScore(0)
+      return
+    }
+
+    const score = 206.835 - 1.015 * (words / sentences) - 84.6 * (syllables / words)
+    setReadabilityScore(Math.max(0, Math.min(100, score)))
+  }, [])
+
+  const countSyllables = (word: string): number => {
+    word = word.toLowerCase()
+    if (word.length <= 3) return 1
+    word = word.replace(/(?:[^laeiouy]es|ed|[^laeiouy]e)$/, '')
+    word = word.replace(/^y/, '')
+    const match = word.match(/[aeiouy]{1,2}/g)
+    return match ? match.length : 0
+  }
+
+  const detectTone = useCallback((text: string) => {
+    const lowerText = text.toLowerCase()
+    const formalWords = ['sincerely', 'regards', 'therefore', 'however']
+    const casualWords = ['hey', 'cool', 'awesome', 'btw']
+    const optimisticWords = ['great', 'amazing', 'excellent', 'positive']
+
+    let toneScore = 0
+    if (formalWords.some(word => lowerText.includes(word))) toneScore++
+    if (casualWords.some(word => lowerText.includes(word))) toneScore--
+    if (optimisticWords.some(word => lowerText.includes(word))) toneScore += 0.5
+
+    if (toneScore > 0.5) setTone('Formal')
+    else if (toneScore < -0.5) setTone('Casual')
+    else if (toneScore > 0) setTone('Optimistic')
+    else setTone('Neutral')
+  }, [])
+
   const insertSEOTemplate = useCallback(() => {
     if (!editor) return
 
     const template = `
 <h1>Compelling SEO-Optimized Title</h1>
-
-<p><strong>Introduction paragraph</strong> with your primary keyword naturally placed. Hook readers with a compelling opening that addresses their pain points and preview the value they'll get from reading.</p>
-
-<h2>Primary Section with Target Keyword</h2>
-
-<p>Provide comprehensive information about your topic. Use your primary keyword naturally throughout the content, aiming for 1-2% keyword density.</p>
-
-<h3>Subsection for Better Organization</h3>
-
-<p>Break down complex topics into digestible sections. Each section should provide unique value and build upon previous information.</p>
-
-<h2>Secondary Important Topic</h2>
-
-<p>Address related topics that your audience cares about. This helps establish topical authority and keeps readers engaged longer.</p>
-
-<h3>Key Benefits or Features</h3>
-
+<p><strong>Introduction:</strong> Start with your primary keyword and hook the reader.</p>
+<h2>Section 1: Main Topic</h2>
+<p>Elaborate on the main topic, using your primary and secondary keywords naturally.</p>
+<h3>Subsection 1.1</h3>
+<p>Dive deeper into a specific aspect of the main topic.</p>
+<h2>Section 2: Related Topic</h2>
+<p>Discuss a related topic to provide more value and context.</p>
 <ul>
-<li><strong>Benefit 1:</strong> Clear, measurable outcome readers will achieve</li>
-<li><strong>Benefit 2:</strong> Another valuable result or advantage</li>
-<li><strong>Benefit 3:</strong> Third compelling reason to care about this topic</li>
+  <li>Key point 1</li>
+  <li>Key point 2</li>
 </ul>
-
-<blockquote>
-<p>Include an insightful quote or key statistic that supports your main points.</p>
-</blockquote>
-
-<h2>Implementation or Action Steps</h2>
-
-<ol>
-<li><strong>Step 1:</strong> Clear, actionable first step</li>
-<li><strong>Step 2:</strong> Second logical action to take</li>
-<li><strong>Step 3:</strong> Third step in the process</li>
-</ol>
-
-<h2>Common Challenges and Solutions</h2>
-
-<p>Address potential obstacles readers might face and provide practical solutions.</p>
-
-<h2>Conclusion and Call-to-Action</h2>
-
-<p>Summarize key takeaways and guide readers toward next steps. Include relevant internal links to related content.</p>
-
-<p><a href="/related-article">Related: Read more about this topic</a></p>
-    `
-
+<h2>Conclusion</h2>
+<p>Summarize the key takeaways and include a call-to-action.</p>
+`
     editor.commands.setContent(template)
   }, [editor])
 
@@ -195,44 +261,19 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
     return <div className="animate-pulse h-96 bg-white/10 rounded-lg"></div>
   }
 
+  const keywordDensity = calculateKeywordDensity(editor.getText(), keywords)
+
   return (
     <div className="border border-white/20 rounded-lg bg-white/5">
       {/* Editor Toolbar */}
       <div className="border-b border-white/20 p-4">
         <div className="flex flex-wrap items-center gap-2">
           {/* Text Formatting */}
-          <button
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bold') ? 'bg-purple-500/20' : ''}`}
-            title="Bold"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          </button>
-
-          <button
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('italic') ? 'bg-purple-500/20' : ''}`}
-            title="Italic"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20H6v-2h4v2zm4-16H6v2h8V4zm4 8H6v4h12v-4z" />
-            </svg>
-          </button>
-
+          <button onClick={() => editor.chain().focus().toggleBold().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bold') ? 'bg-purple-500/20' : ''}`} title="Bold"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></button>
+          <button onClick={() => editor.chain().focus().toggleItalic().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('italic') ? 'bg-purple-500/20' : ''}`} title="Italic"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20H6v-2h4v2zm4-16H6v2h8V4zm4 8H6v4h12v-4z" /></svg></button>
+          
           {/* Headings */}
-          <select
-            onChange={(e) => {
-              const level = parseInt(e.target.value) as 1 | 2 | 3
-              if (level > 0) {
-                editor.chain().focus().toggleHeading({ level }).run()
-              } else {
-                editor.chain().focus().setParagraph().run()
-              }
-            }}
-            className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm"
-          >
+          <select onChange={(e) => { const level = parseInt(e.target.value) as 1 | 2 | 3; if (level > 0) { editor.chain().focus().toggleHeading({ level }).run() } else { editor.chain().focus().setParagraph().run() } }} className="bg-white/10 border border-white/20 rounded px-2 py-1 text-sm">
             <option value="0">Paragraph</option>
             <option value="1">H1</option>
             <option value="2">H2</option>
@@ -240,118 +281,122 @@ const BlogEditor: React.FC<BlogEditorProps> = ({
           </select>
 
           {/* Lists */}
-          <button
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bulletList') ? 'bg-purple-500/20' : ''}`}
-            title="Bullet List"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-
-          <button
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('orderedList') ? 'bg-purple-500/20' : ''}`}
-            title="Numbered List"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-            </svg>
-          </button>
-
+          <button onClick={() => editor.chain().focus().toggleBulletList().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('bulletList') ? 'bg-purple-500/20' : ''}`} title="Bullet List"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg></button>
+          <button onClick={() => editor.chain().focus().toggleOrderedList().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('orderedList') ? 'bg-purple-500/20' : ''}`} title="Numbered List"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg></button>
+          
           {/* Quote */}
-          <button
-            onClick={() => editor.chain().focus().toggleBlockquote().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('blockquote') ? 'bg-purple-500/20' : ''}`}
-            title="Quote"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-            </svg>
-          </button>
+          <button onClick={() => editor.chain().focus().toggleBlockquote().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('blockquote') ? 'bg-purple-500/20' : ''}`} title="Quote"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" /></svg></button>
 
           {/* Table */}
-          <button
-            onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()}
-            className="p-2 rounded hover:bg-white/10"
-            title="Insert Table"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-            </svg>
-          </button>
+          <button onClick={() => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run()} className="p-2 rounded hover:bg-white/10" title="Insert Table"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" /></svg></button>
 
           {/* Code Block */}
-          <button
-            onClick={() => editor.chain().focus().toggleCodeBlock().run()}
-            className={`p-2 rounded hover:bg-white/10 ${editor.isActive('codeBlock') ? 'bg-purple-500/20' : ''}`}
-            title="Code Block"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
-            </svg>
-          </button>
+          <button onClick={() => editor.chain().focus().toggleCodeBlock().run()} className={`p-2 rounded hover:bg-white/10 ${editor.isActive('codeBlock') ? 'bg-purple-500/20' : ''}`} title="Code Block"><svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg></button>
 
           {/* Image Tools */}
           <div className="flex items-center space-x-1">
-            <ImageUpload editor={editor} onImageUploaded={(url) => {
-              // Image already inserted by ImageUpload component
-              console.log('Image uploaded:', url)
-            }} />
-
-            <ImageManager editor={editor} onImageSelect={(url) => {
-              // Image already inserted by ImageManager component
-              console.log('Image selected:', url)
-            }} />
+            <ImageUpload editor={editor} onImageUploaded={(url) => console.log('Image uploaded:', url)} />
+            <ImageManager editor={editor} onImageSelect={(url) => console.log('Image selected:', url)} />
           </div>
 
           <div className="ml-auto flex items-center space-x-2">
-            {/* SEO Template */}
-            <button
-              onClick={insertSEOTemplate}
-              className="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 transition-colors text-sm"
-              title="Insert SEO Template"
-            >
-              SEO Template
-            </button>
+            <button onClick={insertSEOTemplate} className="bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 transition-colors text-sm" title="Insert SEO Template">SEO Template</button>
           </div>
         </div>
 
-        {/* SEO Score */}
-        <div className="mt-4 flex items-center gap-4">
-          <div className="text-sm text-white/70">
-            SEO Score:
-            <span className={`ml-2 font-semibold ${seoScore >= 80 ? 'text-green-400' : seoScore >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
-              {seoScore}/100
-            </span>
+        {/* SEO & Keyword Section */}
+        <div className="mt-4 space-y-4">
+          {/* Keyword Input */}
+          <div>
+            <label className="text-sm text-white/70 mb-1 block">Topic / Target Keywords</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={keywords}
+                onChange={(e) => {
+                  setKeywords(e.target.value)
+                  fetchKeywordSuggestions(e.target.value)
+                  calculateSEO(editor.getText(), e.target.value)
+                }}
+                placeholder="Enter a topic to generate a post or keywords..."
+                className="w-full bg-white/10 border border-white/20 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+              />
+              <button
+                onClick={generateAIPost}
+                disabled={isGeneratingPost || !keywords}
+                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors text-sm disabled:bg-gray-500 disabled:cursor-not-allowed flex items-center"
+              >
+                {isGeneratingPost ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Generating...
+                  </>
+                ) : (
+                  'Generate Post'
+                )}
+              </button>
+            </div>
           </div>
 
-          <div className="flex-1 bg-white/10 rounded-full h-2">
-            <div
-              className={`h-2 rounded-full transition-all ${seoScore >= 80 ? 'bg-green-400' : seoScore >= 60 ? 'bg-yellow-400' : 'bg-red-400'}`}
-              style={{ width: `${seoScore}%` }}
-            ></div>
-          </div>
+          {/* Keyword Suggestions */}
+          {keywordSuggestions.length > 0 && (
+            <div>
+              <label className="text-sm text-white/70 mb-1 block">Suggestions</label>
+              <div className="flex flex-wrap gap-2">
+                {keywordSuggestions.map((suggestion, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      const newKeywords = [...new Set([...keywords.split(','), suggestion].map(k => k.trim()).filter(Boolean))].join(', ')
+                      setKeywords(newKeywords)
+                      calculateSEO(editor.getText(), newKeywords)
+                    }}
+                    className="bg-white/10 text-white/80 px-2 py-1 rounded hover:bg-purple-500/30 transition-colors text-xs"
+                  >
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
-          <button
-            onClick={() => setIsPreview(!isPreview)}
-            className="text-sm text-purple-400 hover:text-purple-300"
-          >
-            {isPreview ? 'Edit' : 'Preview'}
-          </button>
+          {/* Analysis Section */}
+          <div className="flex items-center gap-6 text-sm text-white/70">
+            <div>
+              SEO Score:
+              <span className={`ml-2 font-semibold ${seoScore >= 80 ? 'text-green-400' : seoScore >= 60 ? 'text-yellow-400' : 'text-red-400'}`}>
+                {seoScore}/100
+              </span>
+            </div>
+            <div>
+              Density: <span className="font-semibold text-white">{keywordDensity.toFixed(2)}%</span>
+            </div>
+            <div>
+              Readability: 
+              <span className={`ml-2 font-semibold ${readabilityScore >= 60 ? 'text-green-400' : readabilityScore >= 30 ? 'text-yellow-400' : 'text-red-400'}`}>
+                {readabilityScore.toFixed(0)}
+              </span>
+            </div>
+            <div>
+              Tone: <span className="font-semibold text-white">{tone}</span>
+            </div>
+            <div className="flex-1 bg-white/10 rounded-full h-2">
+              <div className={`h-2 rounded-full transition-all ${seoScore >= 80 ? 'bg-green-400' : seoScore >= 60 ? 'text-yellow-400' : 'text-red-400'}`} style={{ width: `${seoScore}%` }}></div>
+            </div>
+            <button onClick={() => setIsPreview(!isPreview)} className="text-sm text-purple-400 hover:text-purple-300">
+              {isPreview ? 'Edit' : 'Preview'}
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Editor Content */}
       <div className="relative">
         {isPreview ? (
-          <div className="p-4">
-            <div
-              className="prose prose-lg prose-invert max-w-none"
-              dangerouslySetInnerHTML={{ __html: editor.getHTML() }}
-            />
-          </div>
+          <div className="p-4"><div className="prose prose-lg prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: editor.getHTML() }} /></div>
         ) : (
           <EditorContent editor={editor} />
         )}

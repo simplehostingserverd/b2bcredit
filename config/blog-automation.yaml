@@ -1,0 +1,192 @@
+# Blog Automation System Configuration
+# Version: 1.0.0
+
+system:
+  name: "B2B Credit Blog Automation"
+  version: "1.0.0"
+  environment: ${NODE_ENV}
+
+performance_goals:
+  traffic_increase_target: 0.30 # 30% increase in 90 days
+  leads_per_1000_visits: 5
+  avg_dwell_time_seconds: 90
+  optimization_frequency_days: 7
+
+content:
+  style: "authoritative, clear, educational, data-backed"
+  tone: "professional, trust-oriented, not salesy"
+  min_word_count: 1200
+  max_word_count: 2500
+  target_audience: "CFOs, finance directors, business owners"
+
+  # SEO requirements
+  seo:
+    primary_keyword_density: 0.015 # 1.5%
+    min_headings: 5
+    min_internal_links: 3
+    min_external_links: 2
+    readability_target: 60 # Flesch Reading Ease
+
+  # Schema types to generate
+  schema_types:
+    - "Article"
+    - "FAQPage"
+    - "BreadcrumbList"
+
+agents:
+  planner:
+    enabled: true
+    schedule_cron: "0 */6 * * *" # Every 6 hours
+    batch_size: 10
+    min_search_volume: 100
+    max_keyword_difficulty: 60
+
+  writer:
+    enabled: true
+    model: "gpt-4" # or local LLM endpoint
+    temperature: 0.7
+    max_tokens: 3000
+    concurrent_limit: 2
+
+  optimizer:
+    enabled: true
+    min_seo_score: 80
+    auto_fix: true
+    rewrite_threshold: 60
+
+  publisher:
+    enabled: true
+    auto_publish: false # Require manual approval
+    git_commit: true
+    git_branch: "content-automation"
+    staging_first: true
+
+  distributor:
+    enabled: true
+    platforms:
+      linkedin: true
+      twitter: true
+      facebook: false
+    schedule_delay_hours: 2 # Delay after publishing
+
+  analytics:
+    enabled: true
+    update_frequency_hours: 24
+    retention_days: 365
+
+  lead:
+    enabled: true
+    scoring_model: "behavior_fit_intent"
+    hot_lead_threshold: 75
+    warm_lead_threshold: 50
+    crm_sync: true
+
+integrations:
+  openai:
+    enabled: true
+    api_key: ${OPENAI_API_KEY}
+    model: "gpt-4"
+    embedding_model: "text-embedding-3-small"
+
+  serp_api:
+    enabled: false # Using free alternatives
+
+  social:
+    linkedin:
+      enabled: false # Implement when ready
+      access_token: ${LINKEDIN_ACCESS_TOKEN}
+
+    twitter:
+      enabled: false # Implement when ready
+      api_key: ${TWITTER_API_KEY}
+      api_secret: ${TWITTER_API_SECRET}
+
+  email:
+    provider: "resend"
+    api_key: ${RESEND_API_KEY}
+    from_email: "blog@b2bcredit.com"
+    from_name: "B2B Credit Builder"
+
+  analytics:
+    google_analytics: false
+    google_search_console: false
+    custom: true # Using Rybbit
+
+database:
+  vector_dimensions: 1536
+  similarity_threshold: 0.7
+  max_related_content: 5
+
+queue:
+  provider: "redis"
+  redis_url: ${REDIS_URL}
+  default_job_timeout: 300000 # 5 minutes
+  max_retries: 3
+  retry_delay: 5000 # 5 seconds
+
+jobs:
+  topic_discovery:
+    enabled: true
+    schedule: "0 0 * * *" # Daily at midnight
+    priority: "high"
+
+  content_generation:
+    enabled: true
+    schedule: "0 2 * * *" # Daily at 2 AM
+    priority: "high"
+
+  seo_optimization:
+    enabled: true
+    schedule: "0 4 * * *" # Daily at 4 AM
+    priority: "medium"
+
+  distribution:
+    enabled: true
+    schedule: "0 10 * * *" # Daily at 10 AM
+    priority: "medium"
+
+  analytics_sync:
+    enabled: true
+    schedule: "0 */12 * * *" # Every 12 hours
+    priority: "low"
+
+  lead_scoring:
+    enabled: true
+    schedule: "0 */6 * * *" # Every 6 hours
+    priority: "high"
+
+logging:
+  level: "info"
+  agent_logs: true
+  performance_logs: true
+  error_tracking: true
+  retention_days: 90
+
+monitoring:
+  health_check_interval: 60 # seconds
+  alert_on_failure: true
+  alert_email: "admin@b2bcredit.com"
+
+rate_limits:
+  openai_requests_per_minute: 50
+  serp_requests_per_day: 100
+  social_posts_per_day: 10
+
+content_storage:
+  type: "git"
+  repository: "."
+  content_dir: "data/content"
+  draft_dir: "data/content/drafts"
+  published_dir: "data/content/published"
+
+security:
+  require_approval_for_publish: true
+  allowed_editors: ["ADMIN", "STAFF"]
+  audit_all_actions: true
+  encrypt_sensitive_data: true
+
+compliance:
+  verify_facts: true
+  require_sources: true
+  avoid_financial_advice: true
+  regulatory_review: false # Enable for regulated content

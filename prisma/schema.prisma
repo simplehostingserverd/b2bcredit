@@ -61,6 +61,7 @@ model Lead {
   // Relations
   assignedTo        User?        @relation("AssignedTo", fields: [assignedToId], references: [id])
   application       Application?
+  leadScore         LeadScore?
 
   @@map("leads")
 }
@@ -253,6 +254,9 @@ model BlogPost {
   // Relations
   author          User     @relation(fields: [authorId], references: [id])
   category        Category? @relation(fields: [categoryId], references: [id])
+  contentTopic    ContentTopic?
+  performance     ContentPerformance?
+  socialPosts     SocialPost[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -301,3 +305,263 @@ model AuditLog {
   @@index([resource])
   @@index([createdAt])
 }
+
+// ========================================
+// BLOG AUTOMATION SYSTEM MODELS
+// ========================================
+
+model ContentTopic {
+  id                String   @id @default(cuid())
+  topic             String
+  category          String?
+  searchVolume      Int?
+  difficulty        Float?   // SEO difficulty 0-100
+  priority          Int      @default(0) // Higher = more important
+  status            String   @default("DISCOVERED") // DISCOVERED, PLANNED, IN_PROGRESS, PUBLISHED, ARCHIVED
+
+  // Keyword data
+  primaryKeyword    String?
+  secondaryKeywords String[] @default([])
+
+  // Research data
+  competitorUrls    String[] @default([])
+  searchIntent      String?  // informational, commercial, transactional, navigational
+  targetAudience    String?
+
+  // Planning
+  assignedAgent     String?
+  plannedPublishDate DateTime?
+
+  // Relations
+  blogPostId        String?  @unique
+  blogPost          BlogPost? @relation(fields: [blogPostId], references: [id])
+  keywords          ContentKeyword[]
+  tasks             ContentTask[]
+
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@map("content_topics")
+  @@index([status])
+  @@index([priority])
+  @@index([plannedPublishDate])
+}
+
+model ContentKeyword {
+  id              String   @id @default(cuid())
+  keyword         String
+  searchVolume    Int?
+  difficulty      Float?
+  cpc             Float?   // Cost per click (for reference)
+  trend           String?  // up, down, stable
+
+  // Semantic clustering
+  cluster         String?
+  parentKeywordId String?
+
+  // Usage tracking
+  topicId         String?
+  usedInPostIds   String[] @default([])
+
+  // Relations
+  topic           ContentTopic? @relation(fields: [topicId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("content_keywords")
+  @@index([keyword])
+  @@index([cluster])
+  @@index([topicId])
+}
+
+model ContentTask {
+  id              String   @id @default(cuid())
+  topicId         String?
+  agentType       String   // PLANNER, WRITER, OPTIMIZER, PUBLISHER, DISTRIBUTOR, ANALYTICS, LEAD
+  taskType        String   // RESEARCH, GENERATE, OPTIMIZE, PUBLISH, DISTRIBUTE, ANALYZE
+  status          String   @default("PENDING") // PENDING, IN_PROGRESS, COMPLETED, FAILED
+
+  // Task data
+  input           Json?
+  output          Json?
+  errorMessage    String?
+
+  // Scheduling
+  scheduledFor    DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+
+  // Relations
+  topic           ContentTopic? @relation(fields: [topicId], references: [id])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("content_tasks")
+  @@index([agentType])
+  @@index([status])
+  @@index([scheduledFor])
+  @@index([topicId])
+}
+
+model ContentPerformance {
+  id              String   @id @default(cuid())
+  blogPostId      String   @unique
+
+  // Traffic metrics
+  pageViews       Int      @default(0)
+  uniqueVisitors  Int      @default(0)
+  avgTimeOnPage   Float?   // seconds
+  bounceRate      Float?   // percentage
+
+  // SEO metrics
+  organicTraffic  Int      @default(0)
+  rankingKeywords String[] @default([])
+  avgPosition     Float?
+  impressions     Int      @default(0)
+  clicks          Int      @default(0)
+  ctr             Float?   // Click-through rate
+
+  // Engagement metrics
+  shares          Int      @default(0)
+  comments        Int      @default(0)
+  backlinks       Int      @default(0)
+
+  // Conversion metrics
+  leadsGenerated  Int      @default(0)
+  conversionRate  Float?
+
+  // Relations
+  blogPost        BlogPost @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+
+  lastUpdated     DateTime @updatedAt
+  createdAt       DateTime @default(now())
+
+  @@map("content_performance")
+  @@index([organicTraffic])
+  @@index([leadsGenerated])
+}
+
+model LeadScore {
+  id              String   @id @default(cuid())
+  leadId          String   @unique
+
+  // Scoring components
+  behaviorScore   Int      @default(0) // 0-100 based on engagement
+  fitScore        Int      @default(0) // 0-100 based on qualification
+  intentScore     Int      @default(0) // 0-100 based on buying signals
+  totalScore      Int      @default(0) // Combined score
+
+  // Behavioral data
+  pagesViewed     Int      @default(0)
+  timeOnSite      Float?   // seconds
+  visitCount      Int      @default(0)
+  lastVisit       DateTime?
+
+  // Engagement tracking
+  emailOpened     Boolean  @default(false)
+  emailClicked    Boolean  @default(false)
+  downloadedResource Boolean @default(false)
+
+  // Classification
+  segment         String?  // hot, warm, cold
+  stage           String?  // awareness, consideration, decision
+
+  // Relations
+  lead            Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("lead_scores")
+  @@index([totalScore])
+  @@index([segment])
+}
+
+model SocialPost {
+  id              String   @id @default(cuid())
+  blogPostId      String
+  platform        String   // linkedin, twitter, facebook
+
+  // Post content
+  content         String   @db.Text
+  mediaUrls       String[] @default([])
+  hashtags        String[] @default([])
+
+  // Tracking
+  postUrl         String?
+  externalId      String?  // Platform's post ID
+
+  // Metrics
+  impressions     Int      @default(0)
+  engagements     Int      @default(0)
+  clicks          Int      @default(0)
+  shares          Int      @default(0)
+
+  // Status
+  status          String   @default("DRAFT") // DRAFT, SCHEDULED, PUBLISHED, FAILED
+  scheduledFor    DateTime?
+  publishedAt     DateTime?
+
+  // Relations
+  blogPost        BlogPost @relation(fields: [blogPostId], references: [id], onDelete: Cascade)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("social_posts")
+  @@index([blogPostId])
+  @@index([platform])
+  @@index([status])
+  @@index([scheduledFor])
+}
+
+model ContentEmbedding {
+  id              String   @id @default(cuid())
+  contentId       String   // blogPostId or other content ID
+  contentType     String   // blog_post, heading, paragraph
+
+  // Content metadata
+  text            String   @db.Text
+  heading         String?
+  url             String?
+
+  // Embedding vector (requires pgvector extension)
+  // In production: embedding  Unsupported("vector(1536)")
+  embeddingData   Json     // Temporary JSON storage until pgvector is set up
+
+  // Relations
+  relatedContentIds String[] @default([])
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@map("content_embeddings")
+  @@index([contentId])
+  @@index([contentType])
+}
+
+model AgentLog {
+  id              String   @id @default(cuid())
+  agentType       String   // PLANNER, WRITER, OPTIMIZER, PUBLISHER, DISTRIBUTOR, ANALYTICS, LEAD
+  action          String   // Action performed
+  status          String   // SUCCESS, FAILED, PARTIAL
+
+  // Execution data
+  input           Json?
+  output          Json?
+  metrics         Json?    // Performance metrics
+  errorMessage    String?
+
+  // Timing
+  duration        Int?     // milliseconds
+
+  createdAt       DateTime @default(now())
+
+  @@map("agent_logs")
+  @@index([agentType])
+  @@index([status])
+  @@index([createdAt])
+}
+

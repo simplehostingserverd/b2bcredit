@@ -39,7 +39,6 @@ export default function AdminBlogPage() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
-  const [showCreateForm, setShowCreateForm] = useState(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -171,7 +170,7 @@ export default function AdminBlogPage() {
             </p>
           </div>
           <button
-            onClick={() => setShowCreateForm(true)}
+            onClick={() => router.push('/admin/blog/create')}
             className="bg-purple-600 text-white hover:bg-purple-700 btn-glow px-6 py-3 rounded-lg font-semibold"
           >
             Create New Post

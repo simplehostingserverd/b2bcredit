@@ -107,10 +107,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
+    const userRole = (session?.user as any)?.role
 
-    if (!session || (session.user as any)?.role !== 'ADMIN') {
+    if (!session || (userRole !== 'ADMIN' && userRole !== 'STAFF')) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Unauthorized - Admin or Staff access required' },
         { status: 401 }
       )
     }
