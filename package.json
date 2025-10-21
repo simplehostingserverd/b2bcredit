@@ -22,7 +22,7 @@
     "postinstall": "prisma generate",
     "db:seed": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} prisma/seed.ts",
     "db:seed:blog": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} prisma/seed-blog-posts.ts",
-    "admin:setup": "tsx scripts/setup-admin.ts"
+    "admin:setup": "node scripts/setup-admin.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.3",
