@@ -100,11 +100,27 @@ export default function AdminDashboard() {
       <Navbar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
-          <p className="text-white/70 mt-2">
-            Manage applications and leads
-          </p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-white">Admin Dashboard</h1>
+            <p className="text-white/70 mt-2">
+              Manage applications and leads
+            </p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => router.push('/admin/users')}
+              className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+            >
+              Manage Users
+            </button>
+            <button
+              onClick={() => router.push('/admin/blog')}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              Manage Blog
+            </button>
+          </div>
         </div>
 
         {/* Stats Grid */}
