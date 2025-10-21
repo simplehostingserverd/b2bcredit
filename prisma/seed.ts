@@ -7,10 +7,12 @@ async function main() {
   console.log('Seeding database...')
 
   // Create admin user
-  const adminPassword = await hash('admin123', 12)
+  const adminPassword = await hash('newadminpassword', 12)
   const admin = await prisma.user.upsert({
     where: { email: 'admin@b2bcredit.com' },
-    update: {},
+    update: {
+      password: adminPassword,
+    },
     create: {
       email: 'admin@b2bcredit.com',
       password: adminPassword,

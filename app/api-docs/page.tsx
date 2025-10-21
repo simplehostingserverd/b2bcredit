@@ -14,21 +14,6 @@ export default function ApiDocsPage() {
         SwaggerUIBundle({
           url: '/openapi.json',
           dom_id: '#swagger-ui',
-          deepLinking: true,
-          presets: [
-            SwaggerUIBundle.presets.apis,
-            SwaggerUIBundle.SwaggerUIStandalonePreset
-          ],
-          plugins: [
-            SwaggerUIBundle.plugins.DownloadUrl
-          ],
-          layout: 'StandaloneLayout',
-          defaultModelsExpandDepth: 1,
-          defaultModelExpandDepth: 1,
-          docExpansion: 'list',
-          filter: true,
-          showRequestHeaders: true,
-          tryItOutEnabled: true,
         })
       }
     }

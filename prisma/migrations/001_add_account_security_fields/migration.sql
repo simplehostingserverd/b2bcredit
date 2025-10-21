@@ -1,0 +1,9 @@
+-- AlterTable
+ALTER TABLE "users" ADD COLUMN "isLocked" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "users" ADD COLUMN "lockUntil" TIMESTAMP;
+ALTER TABLE "users" ADD COLUMN "isDisabled" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "users" ADD COLUMN "failedLoginAttempts" INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE "users" ADD COLUMN "lastLogin" TIMESTAMP;
+ALTER TABLE "users" ADD COLUMN "lastFailedLogin" TIMESTAMP;
+ALTER TABLE "users" ADD COLUMN "resetToken" TEXT;
+ALTER TABLE "users" ADD COLUMN "resetTokenExpiry" TIMESTAMP;

@@ -5,6 +5,13 @@
   "scripts": {
     "dev": "next dev",
     "dev:https": "node server.js",
+    "dev:full": "concurrently -n \"DB,APP\" -c \"blue,green\" \"docker-compose -f docker-compose.dev.yml up\" \"npm run dev\"",
+    "docker:db": "docker-compose -f docker-compose.dev.yml up",
+    "docker:db:down": "docker-compose -f docker-compose.dev.yml down",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:build": "docker-compose build",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -14,7 +21,8 @@
     "test:coverage": "vitest run --coverage",
     "postinstall": "prisma generate",
     "db:seed": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} prisma/seed.ts",
-    "db:seed:blog": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} prisma/seed-blog-posts.ts"
+    "db:seed:blog": "ts-node --compiler-options {\\\"module\\\":\\\"CommonJS\\\"} prisma/seed-blog-posts.ts",
+    "admin:setup": "tsx scripts/setup-admin.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.3",
@@ -61,6 +69,8 @@
     "@vitejs/plugin-react": "^5.0.4",
     "@vitest/ui": "^3.2.4",
     "autoprefixer": "^10.4.16",
+    "concurrently": "^9.2.1",
+    "dotenv": "^17.2.3",
     "eslint": "^8.56.0",
     "eslint-config-next": "15.0.2",
     "happy-dom": "^20.0.0",

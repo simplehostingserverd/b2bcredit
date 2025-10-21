@@ -7,6 +7,13 @@ import { Button } from './Button'
 export function Navbar() {
   const { data: session, status } = useSession()
 
+  const handleSignOut = () => {
+    if (typeof window !== 'undefined' && window.rybbit) {
+      window.rybbit.event('user_logged_out')
+    }
+    signOut({ callbackUrl: '/' })
+  }
+
   return (
     <nav className="bg-transparent backdrop-blur-sm border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -33,10 +40,15 @@ export function Navbar() {
               <div className="h-8 w-20 bg-white/10 animate-pulse rounded"></div>
             ) : session ? (
               <>
+                {((session.user as any)?.role === 'ADMIN' || (session.user as any)?.role === 'STAFF') && (
+                  <Link href="/admin">
+                    <Button variant="ghost" size="sm" className="text-purple-300 hover:bg-purple-500/10">Admin</Button>
+                  </Link>
+                )}
                 <Link href="/dashboard">
                   <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">Dashboard</Button>
                 </Link>
-                <Button variant="outline" size="sm" className="text-white border-white/20 hover:bg-white/10" onClick={() => signOut({ callbackUrl: '/' })}>
+                <Button variant="outline" size="sm" className="text-white border-white/20 hover:bg-white/10" onClick={handleSignOut}>
                   Sign Out
                 </Button>
               </>

@@ -13,15 +13,27 @@ B2B Credit Building SaaS - A Next.js-based platform for business funding and cre
 - Tailwind CSS
 - Vitest + Testing Library for tests
 - TipTap for rich text editing (blog content)
+- Rybbit Analytics for privacy-friendly tracking
 
 ## Development Commands
 
 ### Running the Application
 ```bash
 npm run dev              # Start development server at http://localhost:3000
+npm run dev:full         # Start PostgreSQL + Next.js dev server (recommended)
 npm run dev:https        # Start with HTTPS (uses server.js)
 npm run build            # Build for production
 npm start                # Start production server
+```
+
+### Docker Commands
+```bash
+npm run docker:db        # Start PostgreSQL in Docker (dev)
+npm run docker:db:down   # Stop PostgreSQL Docker container
+npm run docker:up        # Start full stack in Docker (production)
+npm run docker:down      # Stop all Docker containers
+npm run docker:build     # Rebuild Docker images
+npm run docker:logs      # View Docker logs
 ```
 
 ### Database Management
@@ -34,6 +46,18 @@ npx prisma studio        # Open Prisma Studio database GUI
 npm run db:seed          # Seed database with sample data (prisma/seed.ts)
 npm run db:seed:blog     # Seed blog posts only (prisma/seed-blog-posts.ts)
 ```
+
+### Admin Setup
+```bash
+npm run admin:setup      # Create/reset admin user (default: admin@b2bcredit.com / Admin123!)
+```
+
+Custom admin credentials:
+```bash
+ADMIN_EMAIL="your@email.com" ADMIN_PASSWORD="YourPass" npm run admin:setup
+```
+
+See `ADMIN_SETUP.md` for complete admin panel setup and troubleshooting.
 
 ### Testing
 ```bash
@@ -247,15 +271,25 @@ See `.env.example` for full reference. Critical variables:
 
 ### Common Workflows
 
-**Creating a new admin user:**
+**Creating/resetting admin user:**
 ```bash
-npm run db:seed  # Creates admin@b2bcredit.com (password: admin123)
+npm run admin:setup  # Creates/resets admin@b2bcredit.com (password: Admin123!)
+```
+
+With custom credentials:
+```bash
+ADMIN_EMAIL="admin@company.com" ADMIN_PASSWORD="SecurePass123" npm run admin:setup
 ```
 
 Or manually via Prisma Studio:
 ```bash
-npx prisma studio  # Change user role to ADMIN
+npx prisma studio  # Navigate to users table, change role to ADMIN
 ```
+
+**Accessing admin panel:**
+1. Login at http://localhost:3000/login with admin credentials
+2. Navigate to http://localhost:3000/admin or click "Admin" in navbar
+3. Manage applications, leads, blog posts, and newsletter subscribers
 
 **Adding a new API endpoint:**
 1. Create route file: `app/api/[resource]/route.ts`
@@ -279,6 +313,30 @@ npx prisma migrate dev --name description_of_change
 3. Use `getServerSession(authOptions)` in Server Components for auth checks
 4. For role-based access, check `session.user.role` manually or use RBAC utilities
 
+### Analytics
+
+**Rybbit Analytics Integration:** Privacy-friendly, cookieless analytics
+- Site ID: `a56da861ea4f`
+- Script automatically loaded via `RybbitProvider`
+- User auto-identification on login
+- Dashboard: https://app.rybbit.io
+
+**Tracked Events:**
+- User authentication (login, register, logout)
+- Application saves and submissions
+- Newsletter subscriptions
+- Blog post views
+- Error occurrences
+
+**Adding New Events:**
+```typescript
+import { trackEvent } from '@/lib/analytics'
+
+trackEvent.customEventName({ property: 'value' })
+```
+
+See `ANALYTICS.md` for complete documentation.
+
 ### Repository Conventions
 
 - TypeScript strict mode enabled
@@ -300,6 +358,10 @@ npx prisma migrate dev --name description_of_change
 - `lib/utils/response.ts` - API response formatting
 - `lib/utils/audit.ts` - Audit logging
 - `lib/utils/transactions.ts` - Database transaction wrappers
+- `lib/analytics/index.ts` - Analytics helper utilities
+- `lib/analytics/rybbit.d.ts` - Rybbit TypeScript definitions
+- `components/RybbitProvider.tsx` - Analytics script loader
 - `middleware.ts` - Next.js middleware for route protection
 - `API_DOCUMENTATION.md` - Complete API reference
+- `ANALYTICS.md` - Analytics integration guide
 - `COOLIFY_DEPLOYMENT.md` - Deployment guide

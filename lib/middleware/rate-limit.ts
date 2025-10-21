@@ -24,6 +24,9 @@ export const rateLimitConfigs = {
   standard: { windowMs: 60 * 1000, maxRequests: 60 }, // 60 requests per minute
   relaxed: { windowMs: 60 * 1000, maxRequests: 120 }, // 120 requests per minute
   public: { windowMs: 60 * 1000, maxRequests: 30 }, // 30 requests per minute
+  // Authentication-specific rate limits
+  login: { windowMs: 15 * 60 * 1000, maxRequests: 5 }, // 5 login attempts per 15 minutes
+  passwordReset: { windowMs: 60 * 60 * 1000, maxRequests: 3 }, // 3 password reset requests per hour
 }
 
 /**

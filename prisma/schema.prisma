@@ -12,14 +12,25 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String
-  name          String?
-  role          String    @default("CLIENT")
-  serviceType   String?   // "formation" or "funding"
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                String    @id @default(cuid())
+  email             String    @unique
+  password          String
+  name              String?
+  role              String    @default("CLIENT")
+  serviceType       String?   // "formation" or "funding"
+  
+  // Account security fields
+  isLocked          Boolean   @default(false)
+  lockUntil         DateTime?
+  isDisabled        Boolean   @default(false)
+  failedLoginAttempts Int      @default(0)
+  lastLogin         DateTime?
+  lastFailedLogin   DateTime?
+  resetToken        String?   @unique
+  resetTokenExpiry  DateTime?
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   // Relations
   applications  Application[]

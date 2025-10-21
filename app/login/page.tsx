@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isSubmittingReset, setIsSubmittingReset] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -29,14 +30,55 @@ export default function LoginPage() {
 
       if (result?.error) {
         setError('Invalid email or password')
+        if (typeof window !== 'undefined' && window.rybbit) {
+          window.rybbit.event('login_failed', { error: 'Invalid credentials' })
+        }
       } else {
+        if (typeof window !== 'undefined' && window.rybbit) {
+          window.rybbit.event('user_logged_in', { method: 'credentials' })
+        }
         router.push('/dashboard')
         router.refresh()
       }
     } catch (error) {
       setError('Something went wrong')
+      if (typeof window !== 'undefined' && window.rybbit) {
+        window.rybbit.event('login_error', { error: 'System error' })
+      }
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Please enter your email address first')
+      return
+    }
+
+    setIsSubmittingReset(true)
+    setError('')
+
+    try {
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setError('If an account with this email exists, a password reset link has been sent.')
+      } else {
+        setError(data.error || 'Something went wrong')
+      }
+    } catch (error) {
+      setError('Something went wrong. Please try again.')
+    } finally {
+      setIsSubmittingReset(false)
     }
   }
 
@@ -110,9 +152,14 @@ export default function LoginPage() {
               </div>
 
               <div className="text-sm">
-                <a href="#" className="font-medium text-purple-300 hover:text-purple-200">
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
+                  className="font-medium text-purple-300 hover:text-purple-200"
+                  disabled={isLoading}
+                >
                   Forgot password?
-                </a>
+                </button>
               </div>
             </div>
 

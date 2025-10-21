@@ -45,7 +45,12 @@ export default function ApplicationPage() {
   useEffect(() => {
     // Set service type from session data
     if (status === 'authenticated' && session?.user) {
-      setUserServiceType(session.user.serviceType || null)
+      const serviceType = session.user.serviceType
+      if (serviceType === 'formation' || serviceType === 'funding') {
+        setUserServiceType(serviceType)
+      } else {
+        setUserServiceType(null)
+      }
     }
   }, [status, session])
 
@@ -121,9 +126,18 @@ export default function ApplicationPage() {
       }
 
       setSuccess(true)
+      if (typeof window !== 'undefined' && window.rybbit) {
+        window.rybbit.event('application_saved', { 
+          businessType: formData.businessType,
+          fundingAmount: formData.fundingAmount ? parseFloat(formData.fundingAmount) : undefined
+        })
+      }
       setTimeout(() => setSuccess(false), 3000)
     } catch (err: any) {
       setError(err.message)
+      if (typeof window !== 'undefined' && window.rybbit) {
+        window.rybbit.event('application_save_error', { error: err.message })
+      }
     } finally {
       setSaving(false)
     }

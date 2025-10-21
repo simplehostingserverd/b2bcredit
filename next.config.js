@@ -56,11 +56,11 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-eval' 'unsafe-inline'",
+              "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://app.rybbit.io",
               "style-src 'self' 'unsafe-inline'",
               "img-src 'self' data: https: blob:",
               "font-src 'self' data:",
-              "connect-src 'self' https:",
+              "connect-src 'self' https: https://app.rybbit.io",
               "frame-ancestors 'self'",
               "base-uri 'self'",
               "form-action 'self'"

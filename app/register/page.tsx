@@ -60,10 +60,19 @@ export default function RegisterPage() {
       }
 
       // Successfully registered and signed in, redirect to onboarding
+      if (typeof window !== 'undefined' && window.rybbit) {
+        window.rybbit.event('user_registered', { 
+          serviceType: formData.serviceType,
+          hasBusinessName: !!formData.businessName 
+        })
+      }
       router.push('/onboarding/step-1')
       router.refresh()
     } catch (error) {
       setError('Something went wrong')
+      if (typeof window !== 'undefined' && window.rybbit) {
+        window.rybbit.event('registration_error', { error: 'System error' })
+      }
       setIsLoading(false)
     }
   }

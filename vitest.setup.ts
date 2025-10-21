@@ -1,10 +1,8 @@
 import '@testing-library/jest-dom'
 import { beforeAll, afterEach, afterAll, vi } from 'vitest'
+import { config } from 'dotenv'
 
-// Mock environment variables
-process.env.DATABASE_URL = 'file:./test.db'
-process.env.NEXTAUTH_SECRET = 'test-secret-key-for-testing-only'
-process.env.NEXTAUTH_URL = 'http://localhost:3000'
+config({ path: '.env.development' })
 
 // Suppress console.error in tests for cleaner output
 global.console.error = vi.fn()

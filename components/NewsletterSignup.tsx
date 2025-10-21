@@ -43,12 +43,21 @@ const NewsletterSignup: React.FC<NewsletterSignupProps> = ({
         setIsSuccess(true)
         setEmail('')
         setName('')
+        if (typeof window !== 'undefined' && window.rybbit) {
+          window.rybbit.event('newsletter_subscribed', { source: 'blog' })
+        }
       } else {
         const errorData = await response.json()
         setError(errorData.error || 'Failed to subscribe')
+        if (typeof window !== 'undefined' && window.rybbit) {
+          window.rybbit.event('newsletter_subscribe_failed', { error: errorData.error })
+        }
       }
     } catch (error) {
       setError('Failed to subscribe. Please try again.')
+      if (typeof window !== 'undefined' && window.rybbit) {
+        window.rybbit.event('newsletter_subscribe_error', { error: 'System error' })
+      }
     } finally {
       setIsSubmitting(false)
     }
