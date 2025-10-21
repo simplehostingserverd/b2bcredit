@@ -17,6 +17,9 @@ export default function ApplicationPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [userServiceType, setUserServiceType] = useState<'formation' | 'funding' | null>(null)
+  const [applicationId, setApplicationId] = useState<string | null>(null)
+  const [documents, setDocuments] = useState<any[]>([])
+  const [uploading, setUploading] = useState(false)
 
   const [formData, setFormData] = useState({
     businessName: '',
@@ -61,6 +64,7 @@ export default function ApplicationPage() {
         if (response.ok) {
           const data = await response.json()
           if (data) {
+            setApplicationId(data.id)
             setFormData({
               businessName: data.businessName || '',
               businessType: data.businessType || 'LLC',
@@ -80,6 +84,14 @@ export default function ApplicationPage() {
               fundingAmount: data.fundingAmount?.toString() || '',
               fundingPurpose: data.fundingPurpose || '',
             })
+            
+            if (data.id) {
+              const docsResponse = await fetch(`/api/documents?applicationId=${data.id}`)
+              if (docsResponse.ok) {
+                const docsData = await docsResponse.json()
+                setDocuments(docsData)
+              }
+            }
           }
         }
       } catch (error) {
@@ -96,6 +108,54 @@ export default function ApplicationPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, documentType: string) => {
+    const file = e.target.files?.[0]
+    if (!file || !applicationId) return
+
+    setUploading(true)
+    setError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const uploadResponse = await fetch('/api/upload/image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error('Failed to upload file')
+      }
+
+      const { url } = await uploadResponse.json()
+
+      const documentResponse = await fetch('/api/documents', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          applicationId,
+          name: file.name,
+          type: documentType,
+          url,
+        }),
+      })
+
+      if (!documentResponse.ok) {
+        throw new Error('Failed to save document')
+      }
+
+      const document = await documentResponse.json()
+      setDocuments([...documents, document])
+      setSuccess(true)
+      setTimeout(() => setSuccess(false), 3000)
+    } catch (err: any) {
+      setError(err.message || 'Failed to upload document')
+    } finally {
+      setUploading(false)
+    }
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -236,6 +296,27 @@ export default function ApplicationPage() {
                 onChange={handleChange}
                 placeholder="XX-XXXXXXX"
               />
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  EIN Document Upload
+                </label>
+                <input
+                  type="file"
+                  accept=".pdf,.jpg,.jpeg,.png"
+                  id="ein-upload"
+                  disabled={!applicationId}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 disabled:opacity-50"  
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  {applicationId ? "Upload your EIN verification document (PDF, JPG, or PNG)" : "Save application first to enable document upload"}
+                </p>
+                {documents.filter(d => d.type === "EIN").map(doc => (
+                  <div key={doc.id} className="mt-2 text-sm text-green-600 flex items-center gap-2">
+                    <span>✓ {doc.name}</span>
+                  </div>
+                ))}
+              </div>
+
 
               <Input
                 label="Date Established"
