@@ -19,6 +19,9 @@ export default function ApplicationDetailPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [notes, setNotes] = useState('')
+  const [aiAnalysis, setAiAnalysis] = useState<string | null>(null)
+  const [analyzingWithAI, setAnalyzingWithAI] = useState(false)
+  const [showAIPanel, setShowAIPanel] = useState(false)
 
   useEffect(() => {
     if (status === 'unauthenticated') {
