@@ -89,11 +89,11 @@ NODE_ENV="production"
 
 ```bash
 # Option A: Default admin
-npm run admin:setup
+Admin user is auto-created on deployment (admin@b2bcredit.com / Admin123!)
 # Creates: admin@b2bcredit.com / Admin123!
 
 # Option B: Custom admin
-ADMIN_EMAIL="you@company.com" ADMIN_PASSWORD="SecurePass" npm run admin:setup
+ADMIN_EMAIL="you@company.com" ADMIN_PASSWORD="SecurePass" Admin user is auto-created on deployment (admin@b2bcredit.com / Admin123!)
 ```
 
 ### 3. Verify It's Working
@@ -221,7 +221,7 @@ npm run build            # Build application
 docker-compose up -d     # Start with Docker
 
 # Admin
-npm run admin:setup      # Create admin user
+Admin user is auto-created on deployment (admin@b2bcredit.com / Admin123!)      # Create admin user
 ```
 
 ---
@@ -314,7 +314,7 @@ NODE_ENV=production
 
 # 6. After first deployment, create admin:
 # (SSH into container or use Coolify terminal)
-npm run admin:setup
+Admin user is auto-created on deployment (admin@b2bcredit.com / Admin123!)
 
 # 7. Visit your site and login at /login
 ```

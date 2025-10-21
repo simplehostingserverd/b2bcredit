@@ -148,7 +148,7 @@ After deployment, you need an admin user to access the admin panel.
 ### Method 1: Using Admin Setup Script (Recommended)
 
 ```bash
-npm run admin:setup
+Admin user is auto-created on deployment (admin@b2bcredit.com / Admin123!)
 ```
 
 This creates an admin user:
@@ -157,7 +157,7 @@ This creates an admin user:
 
 **Custom admin credentials:**
 ```bash
-ADMIN_EMAIL="your@email.com" ADMIN_PASSWORD="YourSecurePassword" npm run admin:setup
+ADMIN_EMAIL="your@email.com" ADMIN_PASSWORD="YourSecurePassword" Admin user is auto-created on deployment (admin@b2bcredit.com / Admin123!)
 ```
 
 ### Method 2: Using Prisma Studio (Manual)
@@ -424,7 +424,7 @@ npx prisma migrate deploy # Apply migrations
 npm run db:seed          # Seed sample data
 
 # Admin
-npm run admin:setup      # Create admin user
+Admin user is auto-created on deployment (admin@b2bcredit.com / Admin123!)      # Create admin user
 
 # Building
 npm run build            # Build for production

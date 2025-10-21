@@ -2,23 +2,28 @@
 
 ## Quick Start
 
-### Step 1: Create Admin User
+### Step 1: Admin User Auto-Created ✨
 
-After deploying to Coolify, create an admin user:
+**The admin user is automatically created during deployment!**
 
-**Option A: Default Admin**
+Default credentials:
+- **Email:** `admin@b2bcredit.com`
+- **Password:** `Admin123!`
+
+**To use custom credentials:**
+Add these environment variables in Coolify BEFORE deploying:
 ```bash
-# SSH into your Coolify container or use Coolify's terminal
-npm run admin:setup
+ADMIN_EMAIL=your@email.com
+ADMIN_PASSWORD=YourSecurePassword123
+ADMIN_NAME=Your Name
 ```
 
-This creates:
-- Email: `admin@b2bcredit.com`
-- Password: `Admin123!`
+The admin user will be created/updated automatically on every deployment.
 
-**Option B: Custom Admin**
+**Manual creation (if needed):**
 ```bash
-ADMIN_EMAIL="your@email.com" ADMIN_PASSWORD="YourPassword123" npm run admin:setup
+# SSH into your Coolify container
+npm run admin:setup
 ```
 
 ### Step 2: Login
