@@ -45,20 +45,8 @@ function validateEnvironmentVariables() {
   }
 }
 
-// Validate environment variables and database connection on module load
-try {
-  validateEnvironmentVariables()
-  const dbHealthy = await checkDatabaseConnection()
-  if (!dbHealthy) {
-    throw new Error('Database connection failed')
-  }
-} catch (error) {
-    console.error('System initialization failed:', (error as Error).message)
-    // In production, this would be a critical error
-    if (process.env.NODE_ENV === 'production') {
-      throw error
-    }
-  }
+// Note: Environment validation removed from module load to support Docker builds
+// Validation now happens at runtime when auth is actually used
 
 export const authOptions: NextAuthOptions = {
   session: {
