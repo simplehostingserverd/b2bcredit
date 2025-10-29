@@ -13,4 +13,4 @@ node scripts/setup-admin.js || echo "Warning: Admin setup failed, but continuing
 
 # Start the application
 echo "Starting Next.js server..."
-exec node server.js
+npm run start
