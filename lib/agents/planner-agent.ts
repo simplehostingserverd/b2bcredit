@@ -64,8 +64,6 @@ export class PlannerAgent extends BaseAgent {
     'business credit mistakes'
   ]
 
-  private config: any
-
   constructor() {
     const config = getAgentConfig('planner')
     super('PLANNER', config)
